@@ -1,0 +1,29 @@
+openapi: 3.0.0
+info:
+  title: Runas OpenAPI Specification
+  version: 0.0.1
+servers:
+  - description: Test server, local
+    url: localhost:8080
+tags:
+  - name: dictionary
+    description: Access the dictionary data
+paths:
+  /lexeme:
+    get:
+      tags:
+        - dictionary
+      summary: get lexeme
+      responses:
+        '200':
+          description: OK
+
+  /spelling:
+    summary: Access spellings stored in the dictionary
+    description: Access spellings, i.e. grpahical representations of a 'word'
+    get:
+      tags:
+        - dictionary
+      responses:
+        default:
+          description: Default error sample response
