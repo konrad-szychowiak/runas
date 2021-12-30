@@ -9,21 +9,21 @@ tags:
   - name: dictionary
     description: Access the dictionary data
 paths:
-  /lexeme:
-    get:
-      tags:
-        - dictionary
-      summary: get lexeme
-      responses:
-        '200':
-          description: OK
-
   /spelling:
     summary: Access spellings stored in the dictionary
     description: Access spellings, i.e. grpahical representations of a 'word'
     get:
+      description: List all spellings
       tags:
         - dictionary
       responses:
-        default:
-          description: Default error sample response
+        200:
+          description: Here are your spellings
+
+  /spelling/{id}:
+    get:
+      tags:
+        - dictionary
+      responses:
+        200: {}
+        404: {}

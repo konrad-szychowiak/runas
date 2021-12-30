@@ -12,6 +12,9 @@ drop table if exists paradigm_category;
 drop table if exists part_of_speech;
 drop table if exists spelling;
 
+DROP DOMAIN IF EXISTS description;
+CREATE DOMAIN description as varchar(100);
+
 create table spelling
 (
     word_id  serial primary key,
@@ -22,7 +25,7 @@ create table part_of_speech
 (
     pos_id      serial primary key,
     name        varchar(50) not null,
-    description varchar(50) null
+    description description null
 );
 
 create table paradigm_category
@@ -69,12 +72,12 @@ create table exemplified_by
     primary key (lexeme, example)
 );
 
-create table inflected_form
+CREATE TABLE inflected_form
 (
-    lexeme   int references lexeme (lexeme_id),
-    category int references paradigm_category (category_id),
-    spelling int references spelling (word_id),
-    primary key (lexeme, category, spelling)
+    lexeme   int REFERENCES lexeme (lexeme_id),
+    category int REFERENCES paradigm_category (category_id),
+    spelling int REFERENCES spelling (word_id),
+    PRIMARY KEY (lexeme, category, spelling)
 );
 
 create table "group"

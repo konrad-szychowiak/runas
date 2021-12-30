@@ -1,5 +1,6 @@
 import * as spellingService from "../services/spelling.service.js";
 import Router from "@koa/router";
+import {sql} from "../db.js";
 
 export const spellingController = {
 
@@ -34,5 +35,20 @@ export const spellingController = {
 export default new Router()
     .get('/', spellingController.getAll)
     .get('/:id', spellingController.getOne)
-    .post('/', spellingController.post)
     .delete('/', spellingController.delete)
+    .post('/', async (ctx) => {
+        const {text} = ctx.request.body
+        const [foo] = await sql`select *
+                              from spelling
+                              where spelling.spelling = ${text}`
+        if(foo) {
+            ctx.body = { ...foo, message: 'existed' };
+            return
+        }
+        await sql`insert into spelling (spelling)
+                  values (${text});`
+        const [bar] = await sql`select *
+                              from spelling
+                              where spelling.spelling = ${text}`
+        ctx.body = { ...bar, message: 'created' };
+    })

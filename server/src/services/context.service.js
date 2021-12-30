@@ -3,13 +3,16 @@ import {sql} from "../db.js";
 export const createContext = async (name, description) => {
     if (description)
         await sql`insert into context (name, description)
-                  VALUES (${name}, ${description})`
+                  VALUES (${name}, ${description});`;
+
     else
         await sql`insert into context (name)
-                  values (${name});`
+                  values (${name});`;
+
     const [created] = await sql`select context_id
                                 from context
-                                where name = ${name}`
+                                where name = ${name}`;
+
     const {context_id} = created
     return context_id
 }
@@ -29,8 +32,7 @@ export const updateContext = async (id, name, description) => {
 
     const [updated] = await sql`select *
                                 from context
-                                where context_id = ${id}`
-
+                                where context_id = ${id}`;
     return updated;
 }
 
@@ -38,8 +40,8 @@ export const deleteContext = async (id) => {
     // select the one to delete
     const [toDelete] = await sql`select *
                                  from context
-                                 where context_id = ${id}`
-    console.log(toDelete)
+                                 where context_id = ${id}`;
+    console.log(toDelete);
     // if there is no record with such id
     if (!toDelete) return;
     // delete
