@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "jsx": "react",
+    "downlevelIteration": true,
+    "target": "ES6",
+    "moduleResolution": "Node"
+  },
+  "exclude": ["node_modules"],
+  "include": ["src","types.d.ts"]
+}

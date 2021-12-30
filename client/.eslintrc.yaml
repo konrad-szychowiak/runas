@@ -1,0 +1,11 @@
+extends:
+  - prettier
+env:
+  node: true
+plugins:
+  - prettier
+rules:
+  "prettier/prettier": 2
+parser: "@typescript-eslint/parser"
+
+
