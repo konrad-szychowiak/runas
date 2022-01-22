@@ -1,8 +1,23 @@
 import React, {useState} from 'react';
 import axios from "axios";
 import {useGetAsync} from "../../common/useAsyncState";
-import {Button, Input} from "@vechaiui/react";
 
+function ContextCheckbox(props: { lexeme?: number, context: any }) {
+  const [checked, setChecked] = useState(false)
+
+  const toggleContext = async () => {
+    // if (checked) {
+    //   axios.post(`http://localhost:8080/api/lexeme/`)
+    // }
+  }
+
+  return <div>
+    <label className="checkbox">
+      <input type="checkbox" checked={checked} onChange={event => setChecked(event.target.checked)}/>
+      <code>{props.context.name}</code> {props.context.description ?? ""}
+    </label>
+  </div>;
+}
 
 const Wizard = () => {
   const [categoriesInput, setCategoriesInput] = useState({});
@@ -10,11 +25,15 @@ const Wizard = () => {
   const [reqSpelling, setReqSpelling] = useState('');
   const [definition, setDefinition] = useState('');
   const [selectedPOS, setSelectedPOS] = useState('');
+  const [posDescription, setPosDescription] = useState('')
+
   const {value: categories} = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/pos/${selectedPOS}/category`)).data, {
     dependencies: [selectedPOS],
     initialCall: false
   })
-  const {value: paertsOfSpeech} = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/pos`)).data) as { value: { pos_id, name, description }[] }
+  const {value: partsOfSpeech} = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/pos`)).data) as { value: { pos_id, name, description }[] }
+
+  const {value: contexts} = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/context`)).data)
 
   const saveSpelling = async (value) => {
     const reqSpellings = await axios.post(
@@ -64,49 +83,65 @@ const Wizard = () => {
   }
 
   return (
-    <div>
-      <h1>LEXEME</h1>
-      <div>
-        <label htmlFor="lemma">lemma (spelling)</label>
-        <input type="text" value={lemma} onChange={e => setLemma(e.target.value)}/>
+    <div className={'section'}>
+      <h1 className={'title'}>LEXEME</h1>
+
+      <div className={'field block'}>
+        <label className={'label'} htmlFor="lemma">lemma (spelling)</label>
+        <input className={'input'} type="text" value={lemma} onChange={e => setLemma(e.target.value)}/>
       </div>
-      <div>
-        <label htmlFor="def">definition (varchar 50)</label>
-        <Input type="text" value={definition} onChange={e => setDefinition(e.target.value)}/>
+
+      <div className={'field block'}>
+        <label className={'label'} htmlFor="def">definition (varchar 50)</label>
+        <input className={'input'} type="text" value={definition} onChange={e => setDefinition(e.target.value)}/>
       </div>
-      <br/>
-      <div>
-        <label htmlFor="dog-names">choose part of speech:</label>
-        <select id="dog-names" name="dog-names" onChange={e => setSelectedPOS(e.target.value)}>
+
+      <div className={'field block'}>
+        <label className={'label'} htmlFor="dog-names">choose part of speech:</label>
+        <select className={'select is-small'}
+                id="dog-names"
+                name="dog-names"
+                onChange={e => {
+                  setSelectedPOS(e.target.value);
+                }}>
+          <option>(select)</option>
           {
-            (paertsOfSpeech ?? []).map(value => {
+            (partsOfSpeech ?? []).map(value => {
               return (<>
-                <option key={value.pos_id} value={value.pos_id}>{value.name} {
-                  value.description ?? ''
-                }</option>
+                <option key={value.pos_id} value={value.pos_id}>{value.name}</option>
               </>)
             })
           }
         </select>
+        {posDescription && <q>{posDescription}</q>}
       </div>
-      <div id="cats">
+
+      <div className={'block'} id="cats">
         {
           (categories ?? []).map(category => {
-            return <div key={category.category_id}>
-              <label htmlFor={`def-${category.category_id}`}>{category.name}:</label>
-              <input id={`def-${category.category_id}`} type="text" value={categoriesInput[category.category_id] ?? ''}
+            return <div className={'field'} key={category.category_id}>
+              <label className={'label'} htmlFor={`def-${category.category_id}`}>{category.name}:</label>
+              <input className={'input'} id={`def-${category.category_id}`} type="text"
+                     value={categoriesInput[category.category_id] ?? ''}
                      onChange={e => setCategoriesInput(v => ({...v, [category.category_id]: e.target.value}))}/>
             </div>
           })
         }
       </div>
-      <Button onClick={handleSubmit}>Submit</Button>
+
+      <div className={'block'}>
+        <button className={'button is-primary'} onClick={handleSubmit}>Submit</button>
+      </div>
+
+      <i>Contexts (this doesn't do anything yet)</i>
+      {contexts && contexts.map(context => <ContextCheckbox context={context}/>)}
+
       {reqSpelling && (<>
-        <hr/>
-        <pre id="spelling">
-          {reqSpelling}
-        </pre>
-      </>)}
+          <div className={'notification is-success'}>
+            {reqSpelling}
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -119,6 +154,4 @@ export default Wizard;
 //   "pos": 1,
 //   "definition": "A greeting"
 // }
-
 //
-

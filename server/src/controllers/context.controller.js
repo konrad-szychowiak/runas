@@ -30,7 +30,7 @@ export const contextController =
             console.log(id)
             const deleted = await deleteContext(id)
             console.log(deleted)
-            if (!deleted) ctx.body = deleted
+            if (deleted) ctx.body = deleted
         })
         // List
         .get('/', async ctx => {

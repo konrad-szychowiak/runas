@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="index.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <h1>LEXEME</h1>
+
+    <label for="lemma">lemma (spelling)</label>
+    <input id="lemma" type="text" value="">
+    <button onclick="fetchSpellings()">Lemma</button>
+    <pre id="spelling"></pre>
+
+    <label for="def">definition (varchar 50)</label>
+    <input id="def" type="text" value="">
+
+    <br/>
+
+    <label for="dog-names">choose part of speech:</label>
+    <select id="dog-names" name="dog-names"></select>
+    <button onclick="fetchPoS()">load</button>
+    <button onclick="selectPOS()">select</button>
+
+    <div id="cats"></div>
+
+    <script>
+        async function selectPOS() {
+            const opt = document.getElementById('dog-names').options
+            const pos_id = opt[opt.selectedIndex].value
+            const res = await axios.get(`http://localhost:8080/api/pos/${pos_id}/category`)
+            const data = res.data
+            console.log(data)
+            const cats_div = document.getElementById('cats')
+            cats_div.innerHTML = data.map(({category_id, name}) => `
+                <label for="def">${name}:</label>
+                <input id="${category_id}" type="text" value="">`
+            ).join('<br>')
+        }
+    </script>
+
+</body>
+</html>

@@ -1,25 +1,23 @@
 import React from 'react';
-import {Tab} from '@headlessui/react'
-import {Icon} from "@vechaiui/react";
-
-interface Props {
-  onChange:(index:number)=>void
-}
-
-function NavBar(props:Props) {
+import {Link} from "react-router-dom";
 
 
+
+function NavBar() {
 
   return (
-    <div className={"flex flex-wrap w-full p-8 space-x-4"}>
-      <Tab.Group onChange={props.onChange}>
-        <Tab.List>
-          <Tab key={0} value={0}>
-              <span>Home</span>
-          </Tab>
-        </Tab.List>
-      </Tab.Group>
-    </div>
+    <>
+      <nav className="navbar" role="navigation" aria-label="main navigation">
+        <div id="navbarBasicExample" className="navbar-menu">
+          <div className="navbar-start">
+            <Link className="navbar-item" to={'/'}> Home </Link>
+            <Link className="navbar-item" to={'/wizard'}> Create </Link>
+            <Link className="navbar-item" to={'/design'}> Design </Link>
+            <Link className="navbar-item" to={'/context'}> Context </Link>
+          </div>
+        </div>
+      </nav>
+    </>
   );
 }
 

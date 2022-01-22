@@ -1,10 +1,18 @@
-import {sql} from "../db.js";
+import {pool, sql} from "../../db.js";
 import Router from "@koa/router";
 
 const list = async (ctx) => {
     // TODO
-    const result = await sql`select *
-                             from lexeme`
+    const result = await sql`select lexeme_id      as id,
+                                    s.spelling     as lemma,
+                                    definition,
+                                    name           as pos,
+                                    word_id        as spelling_id,
+                                    part_of_speech as pos_id
+                             from lexeme
+                                      join spelling s on lexeme.spelling = s.word_id
+                                      join part_of_speech pos on lexeme.part_of_speech = pos.pos_id
+                             order by lemma;`
     if (result) ctx.body = result
 }
 
@@ -52,11 +60,30 @@ const readFull = async (ctx) => {
                                          JOIN inflected_form i ON paradigm_category.category_id = i.category
                                          JOIN spelling s ON s.word_id = i.spelling
                                 where lexeme = ${lexeme_id}`
-    const forms = {}
-    inflected.forEach(({name, form}) => {
-        Object.assign(forms, {[name]: form})
-    })
-    ctx.body = {lexeme_id, definition, part_of_speech: pos_name, lemma, forms}
+    const contexts = (await pool.query(`select name,
+                                               context_id
+                                        from contextualised_by
+                                                 join context on contextualised_by.context = context.context_id
+                                        where contextualised_by.lexeme = ${lexeme_id};`)).rows
+    ctx.body = {lexeme_id, definition, part_of_speech: pos_name, lemma, forms: inflected, contexts}
+}
+
+const assignContext = async ctx => {
+    const {lexeme_id} = ctx.params
+    const {id: context_id} = ctx.request.body
+    const result = (await pool.query(`insert into contextualised_by (lexeme, context)
+                                      values ($1, $2)
+                                      returning *`, [lexeme_id, context_id])).rows[0]
+    if (result) ctx.body = result
+}
+
+const disconnectContext = async ctx => {
+    const {lexeme_id, context_id} = ctx.params
+    const result = (await pool.query(`delete from contextualised_by 
+                                      where lexeme = ${lexeme_id} and context = ${context_id}
+                                      returning *`)).rows
+    ctx.code = 200;
+    ctx.body = result
 }
 
 export default new Router()
@@ -64,3 +91,7 @@ export default new Router()
     .get('/:lexeme_id/full', readFull)
     .post('/', create)
     .post('/:lexeme_id/inflected', createInflectedForm)
+
+    // CONTEXTS //
+    .post('/:lexeme_id/context', disconnectContext)
+    .delete('/:lexeme_id/context/:context_id', disconnectContext)
