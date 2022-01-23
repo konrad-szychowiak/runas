@@ -6,7 +6,7 @@ import App from './App';
 import './index.sass';
 import Home from "./views/Home";
 import Wizard from "./views/Wizard";
-import {Design} from "./views/Design";
+import {Design, PartsOfSpeech, POSAdder} from "./views/Design";
 import {DictionaryView} from "./views/DictionaryView";
 import {Lexeme} from "./views/Lexeme";
 import {Contexts} from "./views/Contexts";
@@ -17,12 +17,16 @@ ReactDOM.render(
       <Route path={'/'} element={<App/>}>
         <Route path={''} element={<DictionaryView/>}/>
         <Route path={'wizard'} element={<Wizard/>}/>
-        <Route path={'design'} element={<Design/>}/>
+        <Route path={'design'} element={<Design/>}>
+          <Route path={'pos'} >
+            <Route path={''} element={<PartsOfSpeech/>}/>
+            <Route path={'create'} element={<POSAdder/>}/>
+            <Route path={':pos_id'} element={<POSAdder/>}/>
+          </Route>
+          <Route path={'context'} element={<Contexts/>}/>
+        </Route>
         <Route path={'lexeme'}>
           <Route path={':lexeme_id'} element={<Lexeme/>}/>
-        </Route>
-        <Route path={'context'} element={<Contexts />}>
-
         </Route>
       </Route>
     </Routes>

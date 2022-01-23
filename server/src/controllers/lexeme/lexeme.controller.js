@@ -79,19 +79,34 @@ const assignContext = async ctx => {
 
 const disconnectContext = async ctx => {
     const {lexeme_id, context_id} = ctx.params
-    const result = (await pool.query(`delete from contextualised_by 
-                                      where lexeme = ${lexeme_id} and context = ${context_id}
+    const result = (await pool.query(`delete
+                                      from contextualised_by
+                                      where lexeme = ${lexeme_id}
+                                        and context = ${context_id}
                                       returning *`)).rows
     ctx.code = 200;
     ctx.body = result
 }
 
+const del = async ctx => {
+    const {lexeme_id} = ctx.params
+    const result = (await pool.query(`delete
+                                      from lexeme
+                                      where lexeme_id = $1
+                                      returning *`, [lexeme_id]))
+    ctx.body = result
+}
+
 export default new Router()
+    .post('/', create)
     .get('/', list)
     .get('/:lexeme_id/full', readFull)
-    .post('/', create)
+    .delete('/:lexeme_id', del)
+
+    // INFLECTED FORM //
     .post('/:lexeme_id/inflected', createInflectedForm)
 
+
     // CONTEXTS //
-    .post('/:lexeme_id/context', disconnectContext)
+    .post('/:lexeme_id/context', assignContext)
     .delete('/:lexeme_id/context/:context_id', disconnectContext)

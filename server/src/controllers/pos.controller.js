@@ -3,9 +3,9 @@ import Router from "@koa/router";
 
 const listPartsOfSpeech = async (ctx) => {
     // TODO
-    const result = await sql`select *
+    const result = (await pool.query(`select *
                              from part_of_speech
-                             order by pos_id`
+                             order by pos_id`)).rows
     if (result) ctx.body = result
 }
 
@@ -30,10 +30,10 @@ const listCategoriesForPoSById = async (ctx) => {
 const update = async ctx => {
     const {pos_id} = ctx.params;
     const {description} = ctx.request.body;
-    const modified = await sql`update part_of_speech
-                               set description = ${description}
-                               where pos_id = ${pos_id}
-                               returning *;`
+    const modified = (await pool.query(`update part_of_speech
+                                        set description = ${description}
+                                        where pos_id = ${pos_id}
+                                        returning *;`)).rows
     if (modified) ctx.body = modified;
 }
 

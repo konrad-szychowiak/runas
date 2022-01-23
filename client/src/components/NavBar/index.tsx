@@ -11,9 +11,9 @@ function NavBar() {
         <div id="navbarBasicExample" className="navbar-menu">
           <div className="navbar-start">
             <Link className="navbar-item" to={'/'}> Home </Link>
+            <Link className="navbar-item" to={'/design'}> Analysis </Link>
             <Link className="navbar-item" to={'/wizard'}> Create </Link>
-            <Link className="navbar-item" to={'/design'}> Design </Link>
-            <Link className="navbar-item" to={'/context'}> Context </Link>
+            {/*<Link className="navbar-item" to={'/context'}> Context </Link>*/}
           </div>
         </div>
       </nav>

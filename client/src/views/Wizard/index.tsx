@@ -2,22 +2,34 @@ import React, {useState} from 'react';
 import axios from "axios";
 import {useGetAsync} from "../../common/useAsyncState";
 
-function ContextCheckbox(props: { lexeme?: number, context: any }) {
+function ContextCheckbox(props: { lexeme?: number, context: any, onAdd: Function, onRemove: Function }) {
   const [checked, setChecked] = useState(false)
 
-  const toggleContext = async () => {
-    // if (checked) {
-    //   axios.post(`http://localhost:8080/api/lexeme/`)
-    // }
+  const toggleContext = () => {
+    console.log(props.context)
+    if (!checked) {
+      props.onAdd(props.context.context_id)
+    } else {
+      props.onRemove(props.context.context_id)
+    }
   }
 
-  return <div>
+  return <div className={'m-2'}>
     <label className="checkbox">
-      <input type="checkbox" checked={checked} onChange={event => setChecked(event.target.checked)}/>
-      <code>{props.context.name}</code> {props.context.description ?? ""}
+      <input type="checkbox"
+             checked={checked}
+             onChange={event => {
+               setChecked(event.target.checked);
+               toggleContext();
+             }}
+             className={'mr-2'}
+      />
+
+      {checked ? <strong>{props.context.name}</strong> : <s>{props.context.name}</s>} {props.context.description ?? ""}
     </label>
   </div>;
 }
+
 
 const Wizard = () => {
   const [categoriesInput, setCategoriesInput] = useState({});
@@ -26,6 +38,7 @@ const Wizard = () => {
   const [definition, setDefinition] = useState('');
   const [selectedPOS, setSelectedPOS] = useState('');
   const [posDescription, setPosDescription] = useState('')
+  const [selectedContexts, setSelectedContexts] = useState([] as number[]);
 
   const {value: categories} = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/pos/${selectedPOS}/category`)).data, {
     dependencies: [selectedPOS],
@@ -53,6 +66,17 @@ const Wizard = () => {
       })
   }
 
+  /**
+   *
+   * @param lexeme id
+   * @param context id
+   */
+  const saveContext = async (lexeme: number, context: number) => {
+    await axios.post(`http://localhost:8080/api/lexeme/${lexeme}/context`, {
+      id: context
+    })
+  }
+
   const handleSubmit = async () => {
     if (!lemma) return;
     // categories and inflected forms
@@ -73,18 +97,21 @@ const Wizard = () => {
       pos: selectedPOS,
       definition
     })
+
     console.log(re.data)
+
     const lxID = re.data.lexeme_id
 
     await Promise.all(data.map(async el => await saveInflected(lxID, el.key, el.spelling)))
-
+    await Promise.all(selectedContexts.map(async el => await saveContext(lxID, el)))
     const lexeme = await axios.get(`http://localhost:8080/api/lexeme/${lxID}/full`)
+
     setReqSpelling(JSON.stringify(lexeme.data))
   }
 
   return (
     <div className={'section'}>
-      <h1 className={'title'}>LEXEME</h1>
+      <h1 className={'title'}>🧙 LEXEME</h1>
 
       <div className={'field block'}>
         <label className={'label'} htmlFor="lemma">lemma (spelling)</label>
@@ -94,6 +121,22 @@ const Wizard = () => {
       <div className={'field block'}>
         <label className={'label'} htmlFor="def">definition (varchar 50)</label>
         <input className={'input'} type="text" value={definition} onChange={e => setDefinition(e.target.value)}/>
+      </div>
+
+      <div className="field block">
+        <label className={'label'}>Contexts</label>
+        <div style={{display: 'flex', flexDirection: 'row'}}>
+          {contexts && contexts.map(context => <ContextCheckbox
+            onAdd={(id) => {
+              setSelectedContexts([...selectedContexts, id])
+              console.log(selectedContexts)
+            }}
+            onRemove={(id) => {
+              setSelectedContexts(selectedContexts.filter(el => el !== id))
+              console.log(selectedContexts)
+            }}
+            context={context}/>)}
+        </div>
       </div>
 
       <div className={'field block'}>
@@ -133,8 +176,6 @@ const Wizard = () => {
         <button className={'button is-primary'} onClick={handleSubmit}>Submit</button>
       </div>
 
-      <i>Contexts (this doesn't do anything yet)</i>
-      {contexts && contexts.map(context => <ContextCheckbox context={context}/>)}
 
       {reqSpelling && (<>
           <div className={'notification is-success'}>
@@ -147,11 +188,3 @@ const Wizard = () => {
 };
 
 export default Wizard;
-
-// localhost:8080/api/lexeme/
-// {
-//   "spelling": 1,
-//   "pos": 1,
-//   "definition": "A greeting"
-// }
-//
