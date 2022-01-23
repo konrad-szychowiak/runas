@@ -23,7 +23,7 @@ const DictionaryEntry = ({lexeme}: { lexeme: Lexeme }) => {
         {/*<div className="media-content">*/}
         {/*  <span className={"ajdi mr-2"}>{id}</span>*/}
         <Link to={`/lexeme/${id}`}><span className={'spelling mr-2'}>{lemma}</span></Link>
-        <span className={'category mr-2'}>{pos}</span>
+        <span className={'tag is-light is-link mr-2'}>{pos}</span>
         {/*</div>*/}
         {/*</div>*/}
 

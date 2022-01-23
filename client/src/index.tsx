@@ -6,10 +6,12 @@ import App from './App';
 import './index.sass';
 import Home from "./views/Home";
 import Wizard from "./views/Wizard";
-import {Design, PartsOfSpeech, POSAdder} from "./views/Design";
+import {Design, PartsOfSpeech} from "./views/Design";
 import {DictionaryView} from "./views/DictionaryView";
 import {Lexeme} from "./views/Lexeme";
 import {Contexts} from "./views/Contexts";
+import {POSWizard} from "./views/POSWizard";
+import {POSAdder} from "./views/POSAdder";
 
 ReactDOM.render(
   <HashRouter>
@@ -21,7 +23,7 @@ ReactDOM.render(
           <Route path={'pos'} >
             <Route path={''} element={<PartsOfSpeech/>}/>
             <Route path={'create'} element={<POSAdder/>}/>
-            <Route path={':pos_id'} element={<POSAdder/>}/>
+            <Route path={':pos_id'} element={<POSWizard/>}/>
           </Route>
           <Route path={'context'} element={<Contexts/>}/>
         </Route>

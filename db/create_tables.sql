@@ -52,8 +52,8 @@ create table context
 
 create table contextualised_by
 (
-    lexeme  int references lexeme (lexeme_id) ON DELETE CASCADE,
-    context int references context (context_id) ON DELETE CASCADE,
+    lexeme  int references lexeme (lexeme_id),
+    context int references context (context_id),
     primary key (lexeme, context)
 );
 
@@ -68,13 +68,13 @@ create table use_example
 create table exemplified_by
 (
     lexeme  int references lexeme (lexeme_id),
-    example int references use_example (example_id) ON DELETE CASCADE ,
+    example int references use_example (example_id),
     primary key (lexeme, example)
 );
 
 CREATE TABLE inflected_form
 (
-    lexeme   int REFERENCES lexeme (lexeme_id) ON DELETE CASCADE,
+    lexeme   int REFERENCES lexeme (lexeme_id),
     category int REFERENCES paradigm_category (category_id),
     spelling int REFERENCES spelling (word_id),
     PRIMARY KEY (lexeme, category, spelling)
@@ -100,7 +100,7 @@ create table syntactic_group
 
 create table belonging
 (
-    lexeme  int references lexeme (lexeme_id) ON DELETE CASCADE,
+    lexeme  int references lexeme (lexeme_id),
     "group" int references "group" (group_id),
     primary key (lexeme, "group")
 );
