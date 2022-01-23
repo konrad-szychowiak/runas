@@ -4,6 +4,7 @@ import bodyParser from 'koa-bodyparser'
 import spelling from "./controllers/spelling.controller.js";
 import context from "./controllers/context.controller.js";
 import pos from "./controllers/pos.controller.js";
+import example from "./controllers/examples.controller.js";
 import lexeme from "./controllers/lexeme/lexeme.controller.js";
 import cors from '@koa/cors'
 import logger from 'koa-logger'
@@ -23,6 +24,7 @@ async function main() {
   router.use('/spelling', spelling.routes(), spelling.allowedMethods())
   router.use('/context', context.routes(), context.allowedMethods())
   router.use('/pos', pos.routes(), pos.allowedMethods())
+  router.use('/example', example.routes(), example.allowedMethods())
 
   app.use(router.routes());
   app.use(router.allowedMethods());
