@@ -4,17 +4,17 @@ import Router from "@koa/router";
 const listPartsOfSpeech = async (ctx) => {
     // TODO
     const result = (await pool.query(`select *
-                             from part_of_speech
-                             order by pos_id`)).rows
+                                      from part_of_speech
+                                      order by pos_id`)).rows
     if (result) ctx.body = result
 }
 
 const readPartOfSpeechById = async (ctx) => {
     const {pos_id} = ctx.params;
-    const result = sql`select *
-                       from part_of_speech
-                       where pos_id = ${pos_id}
-                       limit 1`
+    const result = (await pool.query(`select *
+                                      from part_of_speech
+                                      where pos_id = ${pos_id}
+                                      limit 1`)).rows
     if (result) ctx.body = result[0]
 }
 
@@ -64,6 +64,15 @@ const createCategory = async ctx => {
     if (result) ctx.body = result
 }
 
+const delCategory = async ctx => {
+    const {pos_id, category_id} = ctx.params
+    const result = (await pool.query(`delete
+                                      from paradigm_category
+                                      where category_id = ${category_id}
+                                      returning *`, [])).rows[0]
+    if (result) ctx.body = result
+}
+
 export default new Router()
     // create
     .post('/', create)
@@ -81,5 +90,6 @@ export default new Router()
     .post('/:pos_id/category/', createCategory)
     // Read
     // Delete
+    .delete('/:pos_id/category/:category_id', delCategory)
     // List
     .get('/:pos_id/category', listCategoriesForPoSById)

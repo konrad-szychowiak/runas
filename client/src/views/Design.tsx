@@ -2,28 +2,30 @@ import {useGetAsync} from "../common/useAsyncState";
 import axios from "axios";
 import React, {useState} from "react";
 import {PartOfSpeech} from "../common/types";
-import {Outlet} from "react-router-dom";
+import {Outlet, useParams} from "react-router-dom";
 import {Link} from "react-router-dom";
 
 
-function POSWizard() {
+export function POSWizard() {
+  const {pos_id: id} = useParams();
   const {
     value: pos
-  } = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/pos/${id}/category`)).data, {
+  } = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/pos/${id}`)).data, {
     dependencies: [],
     initialCall: true
   })
-  if (!pos) return <></>
-  const {pos_id: id, name, description} = pos;
   const {
     value: categories,
     call: getCategories
   } = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/pos/${id}/category`)).data, {
-    dependencies: [id],
+    dependencies: [],
     initialCall: true
   })
   const [cat, setCat] = useState('')
   const [desc, setDesc] = useState('')
+
+  if (!pos) return <></>
+  const {name, description} = pos;
 
   const save = async () => {
     await axios.put(`http://localhost:8080/api/pos/${id}/`,
@@ -43,22 +45,35 @@ function POSWizard() {
     getCategories();
   }
 
-  return (
-    <div className={'card mb-4'}>
-      <div className="card-content">
-        <input className={'input'} disabled value={id}/>
-        <input className={'input'} value={name}/>
-        <textarea className={'textarea'} value={description ?? desc} onChange={e => setDesc(e.target.value)}/>
-        <button className={'button'} onClick={() => save()}>Update</button>
-        <button className="button is-danger" onClick={() => del()}>Delete</button>
-        {categories && categories.map(el =>
-          <pre>
-          {JSON.stringify(el)}
-        </pre>)}
-        <input className={'input'} value={cat} onChange={event => setCat(event.target.value)}/>
-        <button className="button" onClick={() => addCat()}>Add {cat}</button>
+  return (<>
+      <div className={'card mb-4'}>
+        <div className="card-content">
+          <input className={'input'} disabled value={id}/>
+          <input className={'input'} value={name}/>
+          <textarea className={'textarea'} value={description ?? desc} onChange={e => setDesc(e.target.value)}/>
+          <button className={'button'} onClick={() => save()}>Update</button>
+          <button className="button is-danger" onClick={() => del()}>Delete</button>
+
+          <input className={'input'} value={cat} onChange={event => setCat(event.target.value)}/>
+          <button className="button" onClick={() => addCat()}>Add {cat}</button>
+        </div>
       </div>
-    </div>
+
+      {categories && categories.map(el =>
+        <div className={'card mb-4'}>
+          <div className="card-content">
+            {JSON.stringify(el)}
+            <button className={'button is-small is-rounded is-danger'}
+                    onClick={async () => {
+                      await axios.delete(`http://localhost:8080/api/pos/${id}/category/${el.category_id}`);
+                      getCategories();
+                    }}
+            >Delete
+            </button>
+          </div>
+        </div>)}
+
+    </>
   )
 }
 
