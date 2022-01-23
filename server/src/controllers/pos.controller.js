@@ -30,10 +30,11 @@ const listCategoriesForPoSById = async (ctx) => {
 const update = async ctx => {
     const {pos_id} = ctx.params;
     const {description} = ctx.request.body;
+    console.log(ctx.request.body)
     const modified = (await pool.query(`update part_of_speech
-                                        set description = ${description}
-                                        where pos_id = ${pos_id}
-                                        returning *;`)).rows
+                                        set description = $1
+                                        where pos_id = $2
+                                        returning *;`, [description, pos_id])).rows
     if (modified) ctx.body = modified;
 }
 
