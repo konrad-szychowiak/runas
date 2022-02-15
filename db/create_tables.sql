@@ -68,7 +68,7 @@ create table use_example
 create table exemplified_by
 (
     lexeme  int references lexeme (lexeme_id),
-    example int references use_example (example_id) ON DELETE CASCADE ,
+    example int references use_example (example_id) ON DELETE CASCADE,
     primary key (lexeme, example)
 );
 
@@ -88,13 +88,14 @@ create table "group"
 
 create table morphological_group
 (
-    group_id int primary key references "group" (group_id),
-    core     int references lexeme (lexeme_id)
+    group_id int primary key references "group" (group_id) on delete cascade not null,
+--     fixme: what to do, when lexeme is deleted?
+    core     int references lexeme (lexeme_id) on delete cascade             not null
 );
 
-create table syntactic_group
+create table semantic_group
 (
-    group_id int primary key references "group" (group_id),
+    group_id int primary key references "group" (group_id) on delete cascade,
     meaning  varchar(100) not null
 );
 
@@ -104,3 +105,23 @@ create table belonging
     "group" int references "group" (group_id),
     primary key (lexeme, "group")
 );
+
+-- views
+
+drop view if exists full_morphological_group_view;
+create view full_morphological_group_view as
+select group_id        as id,
+       description,
+       core,
+       'morphological' as group_type
+from "group" g
+         join morphological_group mg using (group_id);
+
+drop view if exists full_semantic_group_view;
+create view full_semantic_group_view as
+select group_id   as id,
+       description,
+       meaning,
+       'semantic' as group_type
+from "group" g
+         join semantic_group mg using (group_id);
