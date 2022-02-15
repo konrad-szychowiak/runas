@@ -1,6 +1,7 @@
 import {pool, sql} from "../db.js";
 import Router from "@koa/router";
 
+
 const listPartsOfSpeech = async (ctx) => {
     // TODO
     const result = (await pool.query(`select *
@@ -8,6 +9,7 @@ const listPartsOfSpeech = async (ctx) => {
                                       order by pos_id`)).rows
     if (result) ctx.body = result
 }
+
 
 const readPartOfSpeechById = async (ctx) => {
     const {pos_id} = ctx.params;
@@ -18,14 +20,17 @@ const readPartOfSpeechById = async (ctx) => {
     if (result) ctx.body = result[0]
 }
 
+
 const listCategoriesForPoSById = async (ctx) => {
     const {pos_id} = ctx.params;
     // todo
+
     const result = (await pool.query(`select *
                                       from paradigm_category
                                       where part_of_speech = ${pos_id}`)).rows
     if (result) ctx.body = result
 }
+
 
 const update = async ctx => {
     const {pos_id} = ctx.params;
@@ -38,6 +43,7 @@ const update = async ctx => {
     if (modified) ctx.body = modified;
 }
 
+
 const create = async ctx => {
     const {name: n, description: d} = ctx.request.body;
     const result = (await pool.query(`insert into part_of_speech ("name", "description")
@@ -45,6 +51,7 @@ const create = async ctx => {
                                       returning pos_id as id;`, [n, d])).rows[0]
     if (result) ctx.body = result
 }
+
 
 const del = async (ctx) => {
     const {pos_id} = ctx.params
@@ -54,6 +61,7 @@ const del = async (ctx) => {
                                       returning pos_id`))
     ctx.body = result
 }
+
 
 const createCategory = async ctx => {
     const {pos_id} = ctx.params
@@ -65,6 +73,7 @@ const createCategory = async ctx => {
     if (result) ctx.body = result
 }
 
+
 const delCategory = async ctx => {
     const {pos_id, category_id} = ctx.params
     const result = (await pool.query(`delete
@@ -73,6 +82,7 @@ const delCategory = async ctx => {
                                       returning *`, [])).rows[0]
     if (result) ctx.body = result
 }
+
 
 export default new Router()
     // create

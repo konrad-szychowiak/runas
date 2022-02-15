@@ -87,6 +87,9 @@ export function Design() {
             <ul className="menu-list">
               <li><Link to={'/design/pos'}>Parts of Speech</Link></li>
               <li><Link to={'/design/context'}>Contexts</Link></li>
+              <li><Link to={'/design/examples'}>Use Examples</Link></li>
+              <li><Link to={'/design/group/m'}>Morphological Groups</Link></li>
+              <li><Link to={'/design/group/s'}>Semantic Groups</Link></li>
             </ul>
             {/*<p className="menu-label">*/}
             {/*  Administration*/}

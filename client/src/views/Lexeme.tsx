@@ -57,18 +57,21 @@ export function Lexeme() {
       </div>
 
       {/*<article className="message is-info">*/}
-        {/*<div className="message-header">*/}
-        {/*  /!*Info*!/*/}
-        {/*  Forms*/}
-        {/*  /!*<button className="delete"></button>*!/*/}
-        {/*</div>*/}
-        {/*<div className="message-body">*/}
-          <table className={'table is-bordered is-hoverable'}>
-            {forms.map(({name, form}) => (
-              <tr key={name + form}><td>{name}</td> <td className="spelling">{form}</td></tr>
-            ))}
-          </table>
-        {/*</div>*/}
+      {/*<div className="message-header">*/}
+      {/*  /!*Info*!/*/}
+      {/*  Forms*/}
+      {/*  /!*<button className="delete"></button>*!/*/}
+      {/*</div>*/}
+      {/*<div className="message-body">*/}
+      <table className={'table is-bordered is-hoverable'}>
+        {forms.map(({name, form}) => (
+          <tr key={name + form}>
+            <td>{name}</td>
+            <td className="spelling">{form}</td>
+          </tr>
+        ))}
+      </table>
+      {/*</div>*/}
       {/*</article>*/}
 
       {/*<pre>{JSON.stringify(lexeme)}</pre>*/}

@@ -97,9 +97,14 @@ const del = async ctx => {
     ctx.body = result
 }
 
+const getMatching = async ctx => {
+
+}
+
 export default new Router()
     .post('/', create)
     .get('/', list)
+    .get('/match', getMatching)
     .get('/:lexeme_id/full', readFull)
     .delete('/:lexeme_id', del)
 

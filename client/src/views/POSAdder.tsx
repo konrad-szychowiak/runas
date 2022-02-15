@@ -8,6 +8,7 @@ export function POSAdder() {
 
   const onCreate = async () => {
     await axios.post(`http://localhost:8080/api/pos/`, {name, description});
+    window.history.back();
   }
 
   return <>
@@ -16,9 +17,9 @@ export function POSAdder() {
         <input className={"input"} placeholder={'Name'} value={name} onChange={event => setName(event.target.value)}/>
         <textarea className={"textarea"} placeholder={'Description'} value={description}
                   onChange={event => setDescription(event.target.value)}/>
-        <Link to={'/design/pos/'}>
+        {/*<Link to={'/design/pos/'}>*/}
           <button className={"button"} onClick={() => onCreate()}>Add</button>
-        </Link>
+        {/*</Link>*/}
       </div>
     </div>
 

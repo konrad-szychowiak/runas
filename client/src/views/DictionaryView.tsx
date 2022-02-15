@@ -2,6 +2,7 @@ import React from 'react';
 import {useGetAsync} from "../common/useAsyncState";
 import axios from "axios";
 import {Link} from "react-router-dom";
+import {DictionarySearch} from "./DictionarySearch";
 
 type Lexeme = {
   id: number;
@@ -11,6 +12,7 @@ type Lexeme = {
   spelling_id: number
   pos_id: number
 }
+
 const DictionaryEntry = ({lexeme}: { lexeme: Lexeme }) => {
 
   if (!lexeme) return <></>
@@ -26,7 +28,6 @@ const DictionaryEntry = ({lexeme}: { lexeme: Lexeme }) => {
         <span className={'tag is-light is-link mr-2'}>{pos}</span>
         {/*</div>*/}
         {/*</div>*/}
-
         {/*<div className="content">*/}
         <span>{definition}</span>
         {/*</div>*/}
@@ -43,7 +44,6 @@ export const DictionaryView = () => {
 
   const sleepNow = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
-
   return (
     <div>
       <h1 className={'title'}>Dictionary View</h1>
@@ -52,10 +52,7 @@ export const DictionaryView = () => {
             <DictionaryEntry lexeme={el} key={'lemma-entry-' + el.id}/>
           </>)
         }
-      )
-      }
-
+      )}
     </div>
   )
 }
-

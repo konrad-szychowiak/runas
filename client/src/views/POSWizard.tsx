@@ -1,7 +1,7 @@
 import {useParams} from "react-router-dom";
 import {useGetAsync} from "../common/useAsyncState";
 import axios from "axios";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 export function POSWizard() {
   const {pos_id: id} = useParams();
@@ -20,6 +20,12 @@ export function POSWizard() {
   })
   const [cat, setCat] = useState('')
   const [desc, setDesc] = useState('')
+  const [title, setTitle] = useState('')
+
+  useEffect(() => {
+    setDesc(desc)
+    setTitle(name)
+  }, [pos])
 
   if (!pos) return <></>
   const {name, description} = pos;
@@ -33,6 +39,7 @@ export function POSWizard() {
 
   const del = async () => {
     await axios.delete(`http://localhost:8080/api/pos/${id}/`)
+    window.history.back();
   }
 
 
@@ -60,8 +67,8 @@ export function POSWizard() {
       <div className={'card mb-4'}>
         <div className="card-content">
           <input className={'input'} disabled value={id}/>
-          <input className={'input'} value={name}/>
-          <textarea className={'textarea'} value={description ?? desc} onChange={e => setDesc(e.target.value)}/>
+          <input className={'input'} value={title} onChange={event => setTitle(event.target.value)}/>
+          <textarea className={'textarea'} value={desc} onChange={e => setDesc(e.target.value)}/>
 
 
 
