@@ -102,7 +102,7 @@ create table semantic_group
 create table belonging
 (
     lexeme  int references lexeme (lexeme_id) ON DELETE CASCADE,
-    "group" int references "group" (group_id),
+    "group" int references "group" (group_id) on delete cascade,
     primary key (lexeme, "group")
 );
 
