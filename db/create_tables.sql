@@ -31,7 +31,7 @@ create table part_of_speech
 create table paradigm_category
 (
     category_id    serial primary key,
-    part_of_speech int references part_of_speech (pos_id),
+    part_of_speech int references part_of_speech (pos_id) on delete cascade,
     name           varchar(50) not null
 );
 
@@ -67,7 +67,7 @@ create table use_example
 
 create table exemplified_by
 (
-    lexeme  int references lexeme (lexeme_id),
+    lexeme  int references lexeme (lexeme_id) on delete cascade,
     example int references use_example (example_id) ON DELETE CASCADE,
     primary key (lexeme, example)
 );
@@ -75,8 +75,8 @@ create table exemplified_by
 CREATE TABLE inflected_form
 (
     lexeme   int REFERENCES lexeme (lexeme_id) ON DELETE CASCADE,
-    category int REFERENCES paradigm_category (category_id),
-    spelling int REFERENCES spelling (word_id),
+    category int REFERENCES paradigm_category (category_id) on delete cascade,
+    spelling int REFERENCES spelling (word_id) on delete cascade,
     PRIMARY KEY (lexeme, category, spelling)
 );
 
