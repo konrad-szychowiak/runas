@@ -89,20 +89,60 @@ const deleteGroup = async ctx => {
         ctx.body = result
 }
 
+const updateMorphologicalGroup = async ctx => {
+    const {group_id} = ctx.params;
+    const {coreLexeme} = ctx.request.body;
+    const result = (await pool.query(`update morphological_group
+                                      set core = $1
+                                      where group_id = $2 returning *;`, [coreLexeme, group_id])).rows
+
+    ctx.body = result;
+}
+
+const updateSemanticGroup = async ctx => {
+    const {group_id} = ctx.params;
+    const {meaning} = ctx.body;
+    const result = (await pool.query(`update semantic_group
+                                      set meaning = $1
+                                      where group_id = $2 returning *;`, [meaning, group_id])).rows
+    ctx.body = result;
+}
+
+const createBelonging = async ctx => {
+    const {group_id, lexeme_id} = ctx.params;
+    const result = (await pool.query(`insert into belonging (lexeme, "group")
+                                      values ($1, $2) returning *`, [lexeme_id, group_id])).rows[0]
+    ctx.body = result;
+}
+
+const deleteBelonging = async ctx => {
+    const {group_id, lexeme_id} = ctx.params;
+    const result = (await pool.query(`delete
+                                      from belonging
+                                      where lexeme = ${lexeme_id}
+                                        and "group" = ${group_id} returning *`)).rows
+    ctx.body = result;
+}
+
 export default new Router()
     //GROUPS//
     // CRU...
     .post('/morphological', createMorphologicalGroup)
     .get('/morphological', /* get Morphological Group */)
-    .put('/morphological', /* update Morphological Group */)
+    .put('/:group_id/morphological', updateMorphologicalGroup)
     // CRU...
     .post('/semantic', createSemanticGroup)
     .get('/semantic', /* get semantic group */)
-    .put('/semantic', /* update semantic group */)
+    .put('/:group_id/semantic', updateSemanticGroup)
     // D
     .delete('/:group_id', deleteGroup)
     // (L)
     .get('/', getGroups)
     // BELONGING //
-    .post('/:group_id/lexeme/:lexeme_id', /* assign lexeme to group */)
-    .delete('/:group_id/lexeme/:lexeme_id', /* unassign lexeme from a group */)
+    .post('/:group_id/lexeme/:lexeme_id', createBelonging)
+    .delete('/:group_id/lexeme/:lexeme_id', deleteBelonging)
+
+
+// controller od grup jest do poprawy:
+//     - READ z odpowiedniej grupy na podstawie id (jeden endpoint, odpowiedź w zależności od grupy)
+// sprawdzić, czy DELETE na pewno działa jak
