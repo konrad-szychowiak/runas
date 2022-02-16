@@ -141,8 +141,3 @@ export default new Router()
     // BELONGING //
     .post('/:group_id/lexeme/:lexeme_id', createBelonging)
     .delete('/:group_id/lexeme/:lexeme_id', deleteBelonging)
-
-
-// controller od grup jest do poprawy:
-//     - READ z odpowiedniej grupy na podstawie id (jeden endpoint, odpowiedź w zależności od grupy)
-// sprawdzić, czy DELETE na pewno działa jak
