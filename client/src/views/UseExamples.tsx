@@ -5,6 +5,7 @@ import {DictionarySearch} from "./DictionarySearch";
 
 export function UseExamples() {
   const [text, setText] = useState('');
+  const [lexemes, setLexemes] = useState([]);
 
   const {
     value,
@@ -42,8 +43,12 @@ export function UseExamples() {
       {value && value.map(el => <div className="message">
         ${el.example_id} {JSON.stringify(el)}
         <button className="button is-danger is-small is-rounded" onClick={() => deleteUseExample(el.example_id)}>delete</button>
-        <DictionarySearch />
-        <button className={'button'}>Assign</button>
+        <DictionarySearch onSearch={selected => setLexemes(selected)} />
+        <button className={'button'} onClick={() => {
+          lexemes.forEach(lexeme => {
+            axios.post(`http://localhost:8080/api/lexeme/${lexeme.id}/example/${el.example_id}`)
+          })
+        }}>Assign</button>
       </div>)}
     </div>
   </>

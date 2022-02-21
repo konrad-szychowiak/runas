@@ -23,22 +23,20 @@ export function DictionarySearch({onSearch}: { onSearch?: Function }) {
 
   const onChange = value => {
     setSelected(value);
-    onSearch(selected)
+    onSearch(value)
   }
-
-  console.log(options)
 
   if ((!options)) return <></>
 
   return (
     <div>
-      <pre>{JSON.stringify(selected)}</pre>
+      {/*<pre>{JSON.stringify(selected)}</pre>*/}
       <Select
         isMulti
         options={options
           .map(el => ({value: el.lemma.toLowerCase(), label: el.lemma, id: el.id}))}
         value={selected}
-        onChange={value => setSelected(value)}
+        onChange={value => onChange(value)}
       />
     </div>
   );
