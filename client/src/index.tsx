@@ -7,13 +7,14 @@ import './index.sass';
 import {Lexeme} from "./views/LexemeWizard";
 import {Design, PartsOfSpeech} from "./views/Design";
 import {DictionaryView} from "./views/DictionaryView";
-import {Contexts} from "./views/Contexts";
+import {ContextList} from "./views/Context/Context.list";
 import {POSUpdate} from "./views/PartOfSpeech/POS.update";
 import {POSCreate} from "./views/PartOfSpeech/POS.create";
 import {UseExamples} from "./views/UseExamples";
 import {MorphologicalGroup, SemanticGroup} from "./views/Gropus";
 import {LexemeUpdate} from "./views/LexemeWizard/Lexeme.update";
-import { PartOfSpeech } from './views/PartOfSpeech';
+import {PartOfSpeech} from './views/PartOfSpeech';
+import {Context} from './views/Context';
 
 ReactDOM.render(
   <HashRouter>
@@ -25,9 +26,9 @@ ReactDOM.render(
           <Route path={'pos'}>
             <Route path={''} element={<PartsOfSpeech/>}/>
             <Route path={'create'} element={<PartOfSpeech.Create/>}/>
-            <Route path={':pos_id'} element={<POSUpdate/>}/>
+            <Route path={':pos_id'} element={<PartOfSpeech.Update/>}/>
           </Route>
-          <Route path={'context'} element={<Contexts/>}/>
+          <Route path={'context'} element={<Context.List/>}/>
           <Route path={'examples'} element={<UseExamples/>}/>
           <Route path={'group'}>
             <Route path={'m'} element={<MorphologicalGroup/>}/>
