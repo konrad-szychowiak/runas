@@ -3,16 +3,9 @@ import Router from "@koa/router";
 
 const list = async (ctx) => {
     // TODO
-    const result = await sql`select lexeme_id      as id,
-                                    s.spelling     as lemma,
-                                    definition,
-                                    name           as pos,
-                                    word_id        as spelling_id,
-                                    part_of_speech as pos_id
-                             from lexeme
-                                      join spelling s on lexeme.spelling = s.word_id
-                                      join part_of_speech pos on lexeme.part_of_speech = pos.pos_id
-                             order by lemma;`
+    const result = (await pool.query(`select *
+                                      from entry
+                                      order by lemma;`)).rows
     if (result) ctx.body = result
 }
 
@@ -42,30 +35,53 @@ const createInflectedForm = async (ctx) => {
     ctx.body = inflected_form
 }
 
+const read = async ctx => {
+    const {lexeme_id} = ctx.request.params;
+    const lexeme = (await pool.query(`select *
+                                      from entry
+                                      where id = ${lexeme_id}
+                                      limit 1`)).rows[0]
+    if (!lexeme) return;
+    console.log('lexeme with id', lexeme_id, "is:", lexeme)
+}
+
 const readFull = async (ctx) => {
+    read(ctx);
     const {lexeme_id} = ctx.request.params;
     const [lex] = await sql`select *
                             from lexeme
                             where lexeme_id = ${lexeme_id}`
+
     const {part_of_speech, spelling, definition} = lex;
+
     const [pos_name] = await sql`select *
                                  from part_of_speech
                                  where pos_id = ${part_of_speech}`;
+
     const [{lemma}] = await sql`select spelling.spelling as lemma
                                 from spelling
                                 where word_id = ${spelling}
                                 limit 1`;
+
     const inflected = await sql`SELECT name, s.spelling as form
                                 FROM paradigm_category
                                          JOIN inflected_form i ON paradigm_category.category_id = i.category
                                          JOIN spelling s ON s.word_id = i.spelling
                                 where lexeme = ${lexeme_id}`
+
     const contexts = (await pool.query(`select name,
                                                context_id
                                         from contextualised_by
                                                  join context on contextualised_by.context = context.context_id
                                         where contextualised_by.lexeme = ${lexeme_id};`)).rows
-    ctx.body = {lexeme_id, definition, part_of_speech: pos_name, lemma, forms: inflected, contexts}
+
+    const examples = (await pool.query(`select example_id as id,
+                                               text,
+                                               source_ref as source
+                                        from exemplified_by eb
+                                                 join use_example ue on ue.example_id = eb.example
+                                        where eb.lexeme = ${lexeme_id};`)).rows
+    ctx.body = {lexeme_id, definition, part_of_speech: pos_name, lemma, forms: inflected, contexts, examples}
 }
 
 const assignContext = async ctx => {
@@ -97,21 +113,26 @@ const del = async ctx => {
     ctx.body = result
 }
 
-const getMatching = async ctx => {
-
+const assignExample = async ctx => {
+    const {lexeme_id, example_id} = ctx.params
+    const result = (await pool.query(`insert into exemplified_by (lexeme, example)
+                                      VALUES ($1, $2)
+                                      returning *`, [lexeme_id, example_id]))
+    ctx.body = result
 }
 
 export default new Router()
     .post('/', create)
     .get('/', list)
-    .get('/match', getMatching)
     .get('/:lexeme_id/full', readFull)
     .delete('/:lexeme_id', del)
 
     // INFLECTED FORM //
     .post('/:lexeme_id/inflected', createInflectedForm)
 
-
     // CONTEXTS //
     .post('/:lexeme_id/context', assignContext)
     .delete('/:lexeme_id/context/:context_id', disconnectContext)
+
+    // EXAMPLES //
+    .post(`/:lexeme_id/example/:example_id`, assignExample)

@@ -34,12 +34,12 @@ const listCategoriesForPoSById = async (ctx) => {
 
 const update = async ctx => {
     const {pos_id} = ctx.params;
-    const {description} = ctx.request.body;
+    const {description, name} = ctx.request.body;
     console.log(ctx.request.body)
     const modified = (await pool.query(`update part_of_speech
-                                        set description = $1
+                                        set description = $1, name = $3
                                         where pos_id = $2
-                                        returning *;`, [description, pos_id])).rows
+                                        returning *;`, [description, pos_id, name])).rows
     if (modified) ctx.body = modified;
 }
 
@@ -97,9 +97,9 @@ export default new Router()
     .get('/', listPartsOfSpeech)
 
     // CATEGORIES //
-    // Create
+    // POSCreate
     .post('/:pos_id/category/', createCategory)
-    // Read
+    // LexemeRead
     // Delete
     .delete('/:pos_id/category/:category_id', delCategory)
     // List
