@@ -1,7 +1,7 @@
 import {ContextSchema} from "./schemas";
 import React, {useState} from "react";
 import {LeftRightCard} from "../../components/LeftRightCard";
-import {ModifiableTextField} from "../LexemeWizard/Lexeme.create";
+import {ModifiableTextField} from "../LexemeWizard/ModifiableTextField";
 
 export function ContextUpdate({
                                 context,

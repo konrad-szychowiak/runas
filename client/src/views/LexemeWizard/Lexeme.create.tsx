@@ -1,12 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import axios from "axios";
 import {useGetAsync} from "../../common/useAsyncState";
 import {ContextCheckbox} from "../../components/ContextCheckbox";
+import {ModifiableTextField} from "./ModifiableTextField";
 
 
 function SelectPOS(props: { onChange: (value) => void }) {
 
   const {value: partsOfSpeech} = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/pos`)).data) as { value: { pos_id, name, description }[] }
+  const [selected, setSelected] = useState('')
 
   const mapper = value => {
     return (<>
@@ -23,8 +25,12 @@ function SelectPOS(props: { onChange: (value) => void }) {
       <select className={"select is-small"}
               id="dog-names"
               name="dog-names"
-              onChange={e => props.onChange(e.target.value)}>
-        <option>(select)</option>
+              onChange={e => {
+                const v = e.target.value
+                props.onChange(v)
+                setSelected(v)
+              }}>
+        {selected === '' && <option>(select)</option>}
         {
           (partsOfSpeech ?? []).map(mapper)
         }
@@ -32,34 +38,6 @@ function SelectPOS(props: { onChange: (value) => void }) {
     </div>
   </>;
 }
-
-type ModifiableTextFieldProps = { initialValue: string, onValueChange: (value) => void, labelText?: string, noLabel?: boolean  }
-export const ModifiableTextField = ({
-                                      initialValue,
-                                      onValueChange,
-                                      labelText = 'Lemma (dictionary form)',
-  noLabel = false
-                                    }: ModifiableTextFieldProps) => {
-  const [value, setValue] = useState(initialValue)
-
-  useEffect(() => {
-    setValue(initialValue)
-  }, [initialValue])
-
-  const onChange = event => {
-    const value = event.target.value
-    setValue(value)
-    onValueChange(value)
-  }
-
-  return <>
-    <div className={'field block'}>
-      {!noLabel && <label className={'label'} htmlFor="lemma">{labelText}</label>}
-      <input className={'input'} type="text" value={value} onChange={onChange}/>
-    </div>
-  </>
-}
-
 
 export const Creator = () => {
   const [selectedPOS, setSelectedPOS] = useState('');

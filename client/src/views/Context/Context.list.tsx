@@ -1,9 +1,9 @@
 import React, {useState} from "react";
 import {useGetAsync} from "../../common/useAsyncState";
 import axios from "axios";
-import {ModifiableTextField} from "../LexemeWizard/Lexeme.create";
 import {ContextSchema} from "./schemas";
 import {ContextUpdate} from "./Context.update";
+import {ModifiableTextField} from "../LexemeWizard/ModifiableTextField";
 
 export function ContextList() {
   const [newName, setNewName] = useState('');

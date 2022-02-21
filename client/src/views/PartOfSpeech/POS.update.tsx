@@ -2,7 +2,7 @@ import {useParams} from "react-router-dom";
 import {useGetAsync} from "../../common/useAsyncState";
 import axios from "axios";
 import React, {useEffect, useState} from "react";
-import {ModifiableTextField} from "../LexemeWizard/Lexeme.create";
+import {ModifiableTextField} from "../LexemeWizard/ModifiableTextField";
 
 export function POSUpdate() {
   const {pos_id: id} = useParams();
