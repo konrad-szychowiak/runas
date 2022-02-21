@@ -1,42 +1,72 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from "axios";
 import {useGetAsync} from "../../common/useAsyncState";
+import {ContextCheckbox} from "../../components/ContextCheckbox";
 
-function ContextCheckbox(props: { lexeme?: number, context: any, onAdd: Function, onRemove: Function }) {
-  const [checked, setChecked] = useState(false)
 
-  const toggleContext = () => {
-    console.log(props.context)
-    if (!checked) {
-      props.onAdd(props.context.context_id)
-    } else {
-      props.onRemove(props.context.context_id)
-    }
+function SelectPOS(props: { onChange: (value) => void }) {
+
+  const {value: partsOfSpeech} = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/pos`)).data) as { value: { pos_id, name, description }[] }
+
+  const mapper = value => {
+    return (<>
+      <option key={value.pos_id} value={value.pos_id}>{value.name}</option>
+    </>)
   }
 
-  return <div className={'m-2'}>
-    <label className="checkbox">
-      <input type="checkbox"
-             checked={checked}
-             onChange={event => {
-               setChecked(event.target.checked);
-               toggleContext();
-             }}
-             className={'mr-2'}
-      />
+  return <>
+    <div className={"field block"}>
+      <label className={"label"} htmlFor="dog-names">Part of Speech</label>
+      {/*<span className="tag is-info is-medium mr-2">*/}
+      {/*</span>*/}
 
-      {checked ? <strong>{props.context.name}</strong> : <s>{props.context.name}</s>} {props.context.description ?? ""}
-    </label>
-  </div>;
+      <select className={"select is-small"}
+              id="dog-names"
+              name="dog-names"
+              onChange={e => props.onChange(e.target.value)}>
+        <option>(select)</option>
+        {
+          (partsOfSpeech ?? []).map(mapper)
+        }
+      </select>
+    </div>
+  </>;
+}
+
+type ModifiableTextFieldProps = { initialValue: string, onValueChange: (value) => void, labelText?: string, noLabel?: boolean  }
+export const ModifiableTextField = ({
+                                      initialValue,
+                                      onValueChange,
+                                      labelText = 'Lemma (dictionary form)',
+  noLabel = false
+                                    }: ModifiableTextFieldProps) => {
+  const [value, setValue] = useState(initialValue)
+
+  useEffect(() => {
+    setValue(initialValue)
+  }, [initialValue])
+
+  const onChange = event => {
+    const value = event.target.value
+    setValue(value)
+    onValueChange(value)
+  }
+
+  return <>
+    <div className={'field block'}>
+      {!noLabel && <label className={'label'} htmlFor="lemma">{labelText}</label>}
+      <input className={'input'} type="text" value={value} onChange={onChange}/>
+    </div>
+  </>
 }
 
 
-const Wizard = () => {
+export const Creator = () => {
+  const [selectedPOS, setSelectedPOS] = useState('');
   const [categoriesInput, setCategoriesInput] = useState({});
   const [lemma, setLemma] = useState('');
   const [reqSpelling, setReqSpelling] = useState('');
   const [definition, setDefinition] = useState('');
-  const [selectedPOS, setSelectedPOS] = useState('');
   const [posDescription, setPosDescription] = useState('')
   const [selectedContexts, setSelectedContexts] = useState([] as number[]);
 
@@ -111,15 +141,14 @@ const Wizard = () => {
 
   return (
     <div className={'section'}>
-      <h1 className={'title'}>🧙 LEXEME</h1>
+      <h1 className={'title'}>🧙 Entry / Create</h1>
+
+      <SelectPOS onChange={value => setSelectedPOS(value)}/>
+
+      <ModifiableTextField initialValue={''} onValueChange={value => setLemma(value)}/>
 
       <div className={'field block'}>
-        <label className={'label'} htmlFor="lemma">lemma (spelling)</label>
-        <input className={'input'} type="text" value={lemma} onChange={e => setLemma(e.target.value)}/>
-      </div>
-
-      <div className={'field block'}>
-        <label className={'label'} htmlFor="def">definition (varchar 50)</label>
+        <label className={'label'} htmlFor="def">Definition (varchar 50)</label>
         <input className={'input'} type="text" value={definition} onChange={e => setDefinition(e.target.value)}/>
       </div>
 
@@ -139,25 +168,7 @@ const Wizard = () => {
         </div>
       </div>
 
-      <div className={'field block'}>
-        <label className={'label'} htmlFor="dog-names">choose part of speech:</label>
-        <select className={'select is-small'}
-                id="dog-names"
-                name="dog-names"
-                onChange={e => {
-                  setSelectedPOS(e.target.value);
-                }}>
-          <option>(select)</option>
-          {
-            (partsOfSpeech ?? []).map(value => {
-              return (<>
-                <option key={value.pos_id} value={value.pos_id}>{value.name}</option>
-              </>)
-            })
-          }
-        </select>
-        {posDescription && <q>{posDescription}</q>}
-      </div>
+      <h2 className="subtitle">Inflected Forms</h2>
 
       <div className={'block'} id="cats">
         {
@@ -186,5 +197,3 @@ const Wizard = () => {
     </div>
   );
 };
-
-export default Wizard;

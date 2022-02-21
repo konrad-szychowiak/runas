@@ -4,27 +4,28 @@ import {HashRouter, Route, Routes} from "react-router-dom";
 import React from 'react';
 import App from './App';
 import './index.sass';
-import Wizard from "./views/Wizard";
+import {Lexeme} from "./views/LexemeWizard";
 import {Design, PartsOfSpeech} from "./views/Design";
 import {DictionaryView} from "./views/DictionaryView";
-import {Lexeme} from "./views/Lexeme";
 import {Contexts} from "./views/Contexts";
-import {POSWizard} from "./views/POSWizard";
-import {POSAdder} from "./views/POSAdder";
+import {POSUpdate} from "./views/PartOfSpeech/POS.update";
+import {POSCreate} from "./views/PartOfSpeech/POS.create";
 import {UseExamples} from "./views/UseExamples";
 import {MorphologicalGroup, SemanticGroup} from "./views/Gropus";
+import {LexemeUpdate} from "./views/LexemeWizard/Lexeme.update";
+import { PartOfSpeech } from './views/PartOfSpeech';
 
 ReactDOM.render(
   <HashRouter>
     <Routes>
       <Route path={'/'} element={<App/>}>
         <Route path={''} element={<DictionaryView/>}/>
-        <Route path={'wizard'} element={<Wizard/>}/>
+        <Route path={'wizard'} element={<Lexeme.Creator/>}/>
         <Route path={'design'} element={<Design/>}>
           <Route path={'pos'}>
             <Route path={''} element={<PartsOfSpeech/>}/>
-            <Route path={'create'} element={<POSAdder/>}/>
-            <Route path={':pos_id'} element={<POSWizard/>}/>
+            <Route path={'create'} element={<PartOfSpeech.Create/>}/>
+            <Route path={':pos_id'} element={<POSUpdate/>}/>
           </Route>
           <Route path={'context'} element={<Contexts/>}/>
           <Route path={'examples'} element={<UseExamples/>}/>
@@ -34,7 +35,10 @@ ReactDOM.render(
           </Route>
         </Route>
         <Route path={'lexeme'}>
-          <Route path={':lexeme_id'} element={<Lexeme/>}/>
+          <Route path={':lexeme_id'}>
+            <Route path={''} element={<Lexeme.Read/>}/>
+            <Route path={'update'} element={<LexemeUpdate/>}/>
+          </Route>
         </Route>
 
       </Route>
