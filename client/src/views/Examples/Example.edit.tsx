@@ -3,7 +3,7 @@ import {DictionarySearch} from "../DictionarySearch";
 import axios from "axios";
 import {useParams} from "react-router-dom";
 import {useGetAsync} from "../../common/useAsyncState";
-import {ModifiableTextField} from "../Lexeme/ModifiableTextField";
+import {ModifiableTextField} from "../../components/ModifiableTextField";
 
 export function ExampleEdit() {
   const {example_id: id} = useParams();

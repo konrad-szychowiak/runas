@@ -2,7 +2,7 @@ import {useParams} from "react-router-dom";
 import {useGetAsync} from "../../common/useAsyncState";
 import axios from "axios";
 import React, {useEffect, useState} from "react";
-import {ModifiableTextField} from "../LexemeWizard/ModifiableTextField";
+import {ModifiableTextField} from "../../components/ModifiableTextField";
 
 export function POSUpdate() {
   const {pos_id: id} = useParams();
@@ -73,7 +73,7 @@ export function POSUpdate() {
 
       {/*<div className={'card mb-4'}>*/}
       {/*  <div className="card-content">*/}
-      <ModifiableTextField initialValue={''} onValueChange={setNewCategoryName} labelText={'New Category'}/>
+      <ModifiableTextField initialValue={newCategoryName} onValueChange={setNewCategoryName} labelText={'New Category'}/>
       <button className="button" onClick={() => addCat()}>Add {newCategoryName}</button>
       {/*</div>*/}
       {/*</div>*/}

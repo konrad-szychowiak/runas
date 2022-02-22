@@ -24,7 +24,7 @@ function NavBar() {
             <div className="container">
               <ul>
                 <Link className="navbar-item" to={'/'}> Home </Link>
-                <Link className="navbar-item" to={'/design'}> Analysis </Link>
+                <Link className="navbar-item" to={'/design'}> Configuration </Link>
                 <Link className="navbar-item" to={'/wizard'}> Create </Link>
               </ul>
             </div>

@@ -3,7 +3,7 @@ import {useGetAsync} from "../../common/useAsyncState";
 import axios from "axios";
 import {ContextSchema} from "./schemas";
 import {ContextUpdate} from "./Context.update";
-import {ModifiableTextField} from "../LexemeWizard/ModifiableTextField";
+import {ModifiableTextField} from "../../components/ModifiableTextField";
 
 export function ContextList() {
   const [newName, setNewName] = useState('');
@@ -32,6 +32,17 @@ export function ContextList() {
   }
 
   return <>
+    <article className="message is-info">
+      <div className="message-header">
+        <p>Contexts?</p>
+      </div>
+      <div className="message-body">
+        Context are short labels intended to quickly identify how a lexeme (a word) is used.
+        Most common usage would be marking a lexeme as restricted to specific area of life (technical, medical, etc.),
+        or some demographics (older speakers, youth slang, etc.).
+      </div>
+    </article>
+
     <h1 className="title">List of Contexts</h1>
 
     <ModifiableTextField initialValue={newName} onValueChange={setNewName} labelText={'New Context'}/>
