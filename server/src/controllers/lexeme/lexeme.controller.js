@@ -29,9 +29,9 @@ const create = async (ctx) => {
 const createInflectedForm = async (ctx) => {
     const {lexeme_id} = ctx.request.params;
     const {category, spelling} = ctx.request.body;
-    const [inflected_form] = await sql`insert into inflected_form (lexeme, category, spelling)
-                                       values (${lexeme_id}, ${category}, ${spelling})
-                                       returning *;`
+    const [inflected_form] = (await pool.query(`insert into inflected_form (lexeme, category, spelling)
+                                                values (${lexeme_id}, ${category}, ${spelling})
+                                                returning *;`)).rows
     ctx.body = inflected_form
 }
 
@@ -63,7 +63,10 @@ const readFull = async (ctx) => {
                                 where word_id = ${spelling}
                                 limit 1`;
 
-    const inflected = await sql`SELECT name, s.spelling as form
+    const inflected = await sql`SELECT name,
+                                       s.spelling as form,
+                                       category,
+                                       lexeme
                                 FROM paradigm_category
                                          JOIN inflected_form i ON paradigm_category.category_id = i.category
                                          JOIN spelling s ON s.word_id = i.spelling

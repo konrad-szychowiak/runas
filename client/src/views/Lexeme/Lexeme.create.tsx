@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import axios from "axios";
 import {useGetAsync} from "../../common/useAsyncState";
 import {ContextCheckbox} from "../../components/ContextCheckbox";
-import {ModifiableTextField} from "./ModifiableTextField";
+import {ModifiableTextField} from "../../components/ModifiableTextField";
 
 
 function SelectPOS(props: { onChange: (value) => void }) {

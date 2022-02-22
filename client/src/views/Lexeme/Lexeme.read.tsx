@@ -61,10 +61,8 @@ export function LexemeRead() {
         </div>
 
         <div className="column is-one-third">
-          <code>{JSON.stringify(value)}</code>
-
           <h2 className="subtitle">This lexeme belongs to</h2>
-
+          <code>{JSON.stringify(value)}</code>
         </div>
       </div>
 
