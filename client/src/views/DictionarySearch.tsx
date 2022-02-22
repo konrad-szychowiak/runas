@@ -11,7 +11,7 @@ const filterOptions = (options) => (inputValue: string) => {
   );
 };
 
-export function DictionarySearch({onSearch}: { onSearch?: Function }) {
+export function DictionarySearch({onSearch, preselected}: { onSearch?: Function, preselected?: string[] }) {
   const {value: options} = useGetAsync(
     async () => (await axios.get(`http://localhost:8080/api/lexeme/`)).data,
     {
@@ -20,6 +20,10 @@ export function DictionarySearch({onSearch}: { onSearch?: Function }) {
     })
 
   const [selected, setSelected] = useState<readonly string[]>([]);
+
+  useEffect(() => {
+    setSelected(preselected)
+  }, [preselected])
 
   const onChange = value => {
     setSelected(value);

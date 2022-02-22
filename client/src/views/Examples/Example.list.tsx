@@ -1,12 +1,11 @@
 import React, {useState} from "react";
-import {useGetAsync} from "../common/useAsyncState";
+import {useGetAsync} from "../../common/useAsyncState";
 import axios from "axios";
-import {DictionarySearch} from "./DictionarySearch";
+import {LeftRightCard} from "../../components/LeftRightCard";
+import {Link} from "react-router-dom";
 
-export function UseExamples() {
+export function ExampleList() {
   const [text, setText] = useState('');
-  const [lexemes, setLexemes] = useState([]);
-
   const {
     value,
     call: getValue
@@ -38,18 +37,30 @@ export function UseExamples() {
         </div>
       </div>
 
-      <textarea name="" id="" rows={2} className="textarea mb-4" value={text} onChange={event => setText(event.target.value)}/>
+      <textarea name="" id="" rows={2} className="textarea mb-4" value={text}
+                onChange={event => setText(event.target.value)}/>
 
-      {value && value.map(el => <div className="message">
-        ${el.example_id} {JSON.stringify(el)}
-        <button className="button is-danger is-small is-rounded" onClick={() => deleteUseExample(el.example_id)}>delete</button>
-        <DictionarySearch onSearch={selected => setLexemes(selected)} />
-        <button className={'button'} onClick={() => {
-          lexemes.forEach(lexeme => {
-            axios.post(`http://localhost:8080/api/lexeme/${lexeme.id}/example/${el.example_id}`)
-          })
-        }}>Assign</button>
-      </div>)}
+      {value && value.map(el =>
+        <>
+          <LeftRightCard
+            left={<>${el.example_id} {JSON.stringify(el)}</>}
+            right={<>
+              <Link to={`${el.example_id}`}>
+                <button className="button is-primary mr-2">Edit</button>
+              </Link>
+              <button className="button is-danger"
+                      onClick={() => deleteUseExample(el.example_id)}>Delete
+              </button>
+            </>}/>
+
+          <div className="message">
+
+
+
+          </div>
+        </>
+      )}
     </div>
   </>
 }
+

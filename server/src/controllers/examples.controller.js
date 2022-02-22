@@ -15,8 +15,12 @@ const readUseExampleById = async (ctx) => {
     const result = (await pool.query(`select *
                                       from use_example
                                       where example_id = ${example_id}
-                                      limit 1`)).rows
-    if (result) ctx.body = result[0];
+                                      limit 1`)).rows[0]
+    if (!result) return;
+    const usage = (await pool.query(`select *
+                                     from exemplified_by
+                                     where example = ${example_id};`)).rows
+    ctx.body = {...result, usage};
 }
 
 const update = async ctx => {
@@ -38,7 +42,7 @@ const del = async ctx => {
                                       from use_example
                                       where example_id = ${example_id}
                                       returning example_id`))
-    if(result) ctx.body = result;
+    if (result) ctx.body = result;
 }
 
 const listUseExamples = async ctx => {
