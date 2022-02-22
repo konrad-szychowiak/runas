@@ -31,7 +31,7 @@ create table part_of_speech
 create table paradigm_category
 (
     category_id    serial primary key,
-    part_of_speech int references part_of_speech (pos_id),
+    part_of_speech int references part_of_speech (pos_id) on delete cascade,
     name           varchar(50) not null
 );
 
@@ -67,16 +67,16 @@ create table use_example
 
 create table exemplified_by
 (
-    lexeme  int references lexeme (lexeme_id),
-    example int references use_example (example_id) ON DELETE CASCADE ,
+    lexeme  int references lexeme (lexeme_id) on delete cascade,
+    example int references use_example (example_id) ON DELETE CASCADE,
     primary key (lexeme, example)
 );
 
 CREATE TABLE inflected_form
 (
     lexeme   int REFERENCES lexeme (lexeme_id) ON DELETE CASCADE,
-    category int REFERENCES paradigm_category (category_id),
-    spelling int REFERENCES spelling (word_id),
+    category int REFERENCES paradigm_category (category_id) on delete cascade,
+    spelling int REFERENCES spelling (word_id) on delete cascade,
     PRIMARY KEY (lexeme, category, spelling)
 );
 
@@ -88,19 +88,40 @@ create table "group"
 
 create table morphological_group
 (
-    group_id int primary key references "group" (group_id),
-    core     int references lexeme (lexeme_id)
+    group_id int primary key references "group" (group_id) on delete cascade not null,
+--     fixme: what to do, when lexeme is deleted?
+    core     int references lexeme (lexeme_id) on delete cascade             not null
 );
 
-create table syntactic_group
+create table semantic_group
 (
-    group_id int primary key references "group" (group_id),
+    group_id int primary key references "group" (group_id) on delete cascade,
     meaning  varchar(100) not null
 );
 
 create table belonging
 (
     lexeme  int references lexeme (lexeme_id) ON DELETE CASCADE,
-    "group" int references "group" (group_id),
+    "group" int references "group" (group_id) on delete cascade,
     primary key (lexeme, "group")
 );
+
+-- views
+
+drop view if exists full_morphological_group_view;
+create view full_morphological_group_view as
+select group_id        as id,
+       description,
+       core,
+       'morphological' as group_type
+from "group" g
+         join morphological_group mg using (group_id);
+
+drop view if exists full_semantic_group_view;
+create view full_semantic_group_view as
+select group_id   as id,
+       description,
+       meaning,
+       'semantic' as group_type
+from "group" g
+         join semantic_group mg using (group_id);

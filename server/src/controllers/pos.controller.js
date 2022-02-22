@@ -83,6 +83,16 @@ const delCategory = async ctx => {
     if (result) ctx.body = result
 }
 
+const updateCategory = async ctx => {
+    const {pos_id, category_id} = ctx.params;
+    const {part_of_speech} = ctx.request.body;
+    const {name} = ctx.request.body;
+    const modified = (await pool.query(`update paradigm_category
+                                        set part_of_speech = $1,
+                                            name           = $2
+                                        where pos_id = $3, category_id = $4 returning *`, [part_of_speech, name, pos_id, category_id])).rows
+    if (modified) ctx.body = modified;
+}
 
 export default new Router()
     // create
@@ -99,7 +109,9 @@ export default new Router()
     // CATEGORIES //
     // POSCreate
     .post('/:pos_id/category/', createCategory)
-    // LexemeRead
+    // Read
+    // Update
+    .put('/:pos_id/category/:category_id', updateCategory)
     // Delete
     .delete('/:pos_id/category/:category_id', delCategory)
     // List

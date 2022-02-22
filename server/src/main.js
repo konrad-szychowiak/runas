@@ -6,34 +6,35 @@ import context from "./controllers/context.controller.js";
 import pos from "./controllers/pos.controller.js";
 import example from "./controllers/examples.controller.js";
 import lexeme from "./controllers/lexeme/lexeme.controller.js";
+import group from './controllers/group.controller.js'
 import cors from '@koa/cors'
 import logger from 'koa-logger'
-import {pool} from "./db.js";
 
 const PORT = 8080
 
 async function main() {
-  const app = new Koa();
-  const router = new Router({prefix: '/api'});
+    const app = new Koa();
+    const router = new Router({prefix: '/api'});
 
-  app.use(logger())
-  app.use(bodyParser())
-  app.use(cors())
+    app.use(logger())
+    app.use(bodyParser())
+    app.use(cors())
 
-  router.use('/lexeme', lexeme.routes(), lexeme.allowedMethods())
-  router.use('/spelling', spelling.routes(), spelling.allowedMethods())
-  router.use('/context', context.routes(), context.allowedMethods())
-  router.use('/pos', pos.routes(), pos.allowedMethods())
-  router.use('/example', example.routes(), example.allowedMethods())
+    router.use('/lexeme', lexeme.routes(), lexeme.allowedMethods())
+    router.use('/spelling', spelling.routes(), spelling.allowedMethods())
+    router.use('/context', context.routes(), context.allowedMethods())
+    router.use('/pos', pos.routes(), pos.allowedMethods())
+    router.use('/example', example.routes(), example.allowedMethods())
+    router.use('/group', group.routes(), group.allowedMethods())
 
-  app.use(router.routes());
-  app.use(router.allowedMethods());
+    app.use(router.routes());
+    app.use(router.allowedMethods());
 
-  // pool.connect()
+    // pool.connect()
 
-  app.listen(PORT, () => {
-    console.log('App listening on ' + PORT)
-  });
+    app.listen(PORT, () => {
+        console.log('App listening on ' + PORT)
+    });
 }
 
 main()

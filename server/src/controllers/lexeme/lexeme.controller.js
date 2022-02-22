@@ -78,13 +78,19 @@ const readFull = async (ctx) => {
                                                  join context on contextualised_by.context = context.context_id
                                         where contextualised_by.lexeme = ${lexeme_id};`)).rows
 
-    const examples = (await pool.query(`select example_id as id,
-                                               text,
+    const examples = (await pool.query(`select text,
+                                               example_id,
                                                source_ref as source
-                                        from exemplified_by eb
-                                                 join use_example ue on ue.example_id = eb.example
-                                        where eb.lexeme = ${lexeme_id};`)).rows
-    ctx.body = {lexeme_id, definition, part_of_speech: pos_name, lemma, forms: inflected, contexts, examples}
+                                        from exemplified_by
+                                                 join use_example example on exemplified_by.example = example.example_id
+                                        where exemplified_by.lexeme = ${lexeme_id};`)).rows
+
+    const belongings = (await pool.query(`select description, group_id
+                                          from belonging
+                                                   join "group" on belonging."group" = "group".group_id
+                                          where belonging.lexeme = ${lexeme_id};`)).rows
+
+    ctx.body = {lexeme_id, definition, part_of_speech: pos_name, lemma, forms: inflected, contexts, examples, groups: belongings}
 }
 
 const assignContext = async ctx => {
@@ -117,10 +123,50 @@ const del = async ctx => {
 }
 
 const assignExample = async ctx => {
-    const {lexeme_id, example_id} = ctx.params
+    const {lexeme_id} = ctx.params
+    const {id: example_id} = ctx.request.body
     const result = (await pool.query(`insert into exemplified_by (lexeme, example)
-                                      VALUES ($1, $2)
-                                      returning *`, [lexeme_id, example_id]))
+                                      values ($1, $2)
+                                      returning *`, [lexeme_id, exmaple_id])).rows[0]
+    if (result) ctx.body = result
+}
+
+const deleteExemplified = async ctx => {
+    const {lexeme_id, example_id} = ctx.params
+    const result = (await pool.query(`delete
+                                      from exemplified_by
+                                      where lexeme = ${lexeme_id}
+                                        and example = ${example_id}
+                                      returning *`)).rows
+    ctx.code = 200;
+    ctx.body = result
+}
+
+const readExamples = async ctx => {
+    const {lexeme_id} = ctx.params
+    const result = (await pool.query(`select *
+                                      from exemplified_by
+                                      where lexeme = ${lexeme_id}`)).rows
+    if (result) ctx.body = result
+}
+
+const updateInflectedForm = async ctx => {
+    const {lexeme_id} = ctx.params
+    const {category} = ctx.request.body
+    const {spelling} = ctx.request.body
+
+    const modified = (await pool.query(`update inflected_form
+                                        set category = $1,
+                                            spelling = $2
+                                        where lexeme = $3 returning *;`, [category, spelling, lexeme_id])).rows
+    if (modified) ctx.body = modified
+}
+
+const deleteInflectedForm = async ctx => {
+    const {lexeme_id} = ctx.params
+    const result = (await pool.query(`delete
+                                      from inflected_form
+                                      where lexeme = $1 returning *`, [lexeme_id]))
     ctx.body = result
 }
 
@@ -132,10 +178,17 @@ export default new Router()
 
     // INFLECTED FORM //
     .post('/:lexeme_id/inflected', createInflectedForm)
+    //update
+    .put('/:lexeme_id/inflected', updateInflectedForm)
+    //delete
+    .delete('/"lexeme_id/inflected', deleteInflectedForm)
 
     // CONTEXTS //
     .post('/:lexeme_id/context', assignContext)
     .delete('/:lexeme_id/context/:context_id', disconnectContext)
 
-    // EXAMPLES //
-    .post(`/:lexeme_id/example/:example_id`, assignExample)
+
+    //EXAMPLE//
+    .post('/:lexeme_id/example', assignExample)
+    .delete('/:lexeme_id/example/:example_id', deleteExemplified)
+    .get('/:lexeme_id/example', readExamples)
