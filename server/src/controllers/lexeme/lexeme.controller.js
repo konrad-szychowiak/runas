@@ -65,8 +65,14 @@ const readFull = async (ctx) => {
                                         from contextualised_by
                                                  join context on contextualised_by.context = context.context_id
                                         where contextualised_by.lexeme = ${lexeme_id};`)).rows
-    const examples = (await pool.query(`select text, example_id from exemplified_by join example on exemplified_by.example = example.example_id where exemplified_by.lexeme = ${lexeme_id};`)).rows
-    const belongings = (await pool.query(`select description, group_id from belonging join "group" on belonging."group" = "group".group_id where belonging.lexeme = ${lexeme_id};`)).rows
+    const examples = (await pool.query(`select text, example_id
+                                        from exemplified_by
+                                                 join use_example example on exemplified_by.example = example.example_id
+                                        where exemplified_by.lexeme = ${lexeme_id};`)).rows
+    const belongings = (await pool.query(`select description, group_id
+                                          from belonging
+                                                   join "group" on belonging."group" = "group".group_id
+                                          where belonging.lexeme = ${lexeme_id};`)).rows
 
     ctx.body = {lexeme_id, definition, part_of_speech: pos_name, lemma, forms: inflected, contexts}
 }
@@ -101,10 +107,12 @@ const del = async ctx => {
 }
 
 const assignExample = async ctx => {
-	const {lexeme_id} = ctx.params
-	const {id: example_id} = ctx.request.body
-	const result = (await pool.query(`insert into exemplified_by (lexeme, example) values ($1, $2) returning *`, [lexeme_id, exmaple_id])).rows[0]
-	if(result) ctx.body = result
+    const {lexeme_id} = ctx.params
+    const {id: example_id} = ctx.request.body
+    const result = (await pool.query(`insert into exemplified_by (lexeme, example)
+                                      values ($1, $2)
+                                      returning *`, [lexeme_id, exmaple_id])).rows[0]
+    if (result) ctx.body = result
 }
 
 const deleteExemplified = async ctx => {
@@ -112,16 +120,18 @@ const deleteExemplified = async ctx => {
     const result = (await pool.query(`delete
                                       from exemplified_by
                                       where lexeme = ${lexeme_id}
-                                        and example = ${example_id} returning *`)).rows
-    ctx.code
-    200;
+                                        and example = ${example_id}
+                                      returning *`)).rows
+    ctx.code = 200;
     ctx.body = result
 }
 
 const readExamples = async ctx => {
-	const {lexeme_id} = ctx.params
-	const result = (await pool.query(`select * from exemplified_by where lexeme = ${lexeme_id}`)).rows
-	if (result) ctx.body = result
+    const {lexeme_id} = ctx.params
+    const result = (await pool.query(`select *
+                                      from exemplified_by
+                                      where lexeme = ${lexeme_id}`)).rows
+    if (result) ctx.body = result
 }
 
 const updateInflectedForm = async ctx => {
@@ -157,12 +167,11 @@ export default new Router()
     //delete
     .delete('/"lexeme_id/inflected', deleteInflectedForm)
 
-
     // CONTEXTS //
     .post('/:lexeme_id/context', assignContext)
     .delete('/:lexeme_id/context/:context_id', disconnectContext)
-    
-    
+
+
     //EXAMPLE//
     .post('/:lexeme_id/example', assignExample)
     .delete('/:lexeme_id/example/:example_id', deleteExemplified)
