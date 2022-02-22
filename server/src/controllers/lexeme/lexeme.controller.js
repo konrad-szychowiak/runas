@@ -107,7 +107,7 @@ const assignExample = async ctx => {
 	if(result) ctx.body = result
 }
 
-const disconnectExample = async ctx => {
+const deleteExemplified = async ctx => {
     const {lexeme_id, example_id} = ctx.params
     const result = (await pool.query(`delete
                                       from exemplified_by
@@ -124,6 +124,26 @@ const readExamples = async ctx => {
 	if (result) ctx.body = result
 }
 
+const updateInflectedForm = async ctx => {
+    const {lexeme_id} = ctx.params
+    const {category} = ctx.request.body
+    const {spelling} = ctx.request.body
+
+    const modified = (await pool.query(`update inflected_form
+                                        set category = $1,
+                                            spelling = $2
+                                        where lexeme = $3 returning *;`, [category, spelling, lexeme_id])).rows
+    if (modified) ctx.body = modified
+}
+
+const deleteInflectedForm = async ctx => {
+    const {lexeme_id} = ctx.params
+    const result = (await pool.query(`delete
+                                      from inflected_form
+                                      where lexeme = $1 returning *`, [lexeme_id]))
+    ctx.body = result
+}
+
 export default new Router()
     .post('/', create)
     .get('/', list)
@@ -132,6 +152,10 @@ export default new Router()
 
     // INFLECTED FORM //
     .post('/:lexeme_id/inflected', createInflectedForm)
+    //update
+    .put('/:lexeme_id/inflected', updateInflectedForm)
+    //delete
+    .delete('/"lexeme_id/inflected', deleteInflectedForm)
 
 
     // CONTEXTS //
@@ -141,6 +165,5 @@ export default new Router()
     
     //EXAMPLE//
     .post('/:lexeme_id/example', assignExample)
-    .delete('/:lexeme_id/example/:example_id', disconnectExample)
+    .delete('/:lexeme_id/example/:example_id', deleteExemplified)
     .get('/:lexeme_id/example', readExamples)
-
