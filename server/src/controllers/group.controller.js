@@ -124,8 +124,22 @@ const deleteBelonging = async ctx => {
     ctx.body = result;
 }
 
+const readGroup = async ctx => {
+    const {group_id} = ctx.params;
+    try {
+        const result = (await pool.query(`select * from morphological_group where group_id = ${group_id}`)).rows[0]
+    }catch (e){
+        const result = (await pool.query(`select * from semantic_group where group_id = ${group_id}`)).rows[0]
+    }
+    
+    if (result) ctx.body = result;
+}
+
 export default new Router()
     //GROUPS//
+    //R
+    .get('/:group_id', readGroup)
+    
     // CRU...
     .post('/morphological', createMorphologicalGroup)
     .get('/morphological', /* get Morphological Group */)
