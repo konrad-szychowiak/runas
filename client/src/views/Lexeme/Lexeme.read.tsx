@@ -3,6 +3,7 @@ import {Link, useParams} from "react-router-dom";
 import {useGetAsync} from "../../common/useAsyncState";
 import axios from "axios";
 import {LexemeUsages} from "../../components/LexemeUsages";
+import {Tooltip} from "@primer/react";
 
 export function LexemeRead() {
   const {lexeme_id: id} = useParams()
@@ -38,9 +39,15 @@ export function LexemeRead() {
         <div className="column">
           <div className="content">
             <div className={'tags'}>
-              <span className="tag is-info is-medium mr-2">{pos.name}</span>
+
+              <TooltipTag tag={<span className="tag is-info is-medium mr-2">{pos.name}</span>}
+                          tooltip={pos?.description}/>
+
               {contexts.map(context => (
-                <span className="tag is-medium is-info is-light mr-2">{context.name}</span>
+                <>
+                  <TooltipTag tag={<span className="tag is-medium is-info is-light mr-2">{context.name}</span>}
+                              tooltip={context?.description}/>
+                </>
               ))}
             </div>
             <p className={'notification is-info is-light'}>{definition}</p>
@@ -67,13 +74,27 @@ export function LexemeRead() {
       </div>
 
 
-
       {/*<article className="message is-info">*/}
-
-
 
 
       {/*<pre>{JSON.stringify(lexeme)}</pre>*/}
     </div>
   </>)
+}
+
+function TooltipTag({tag, tooltip}: { tag: JSX.Element, tooltip: JSX.Element | string }) {
+  return <>
+    <div className="dropdown is-hoverable">
+      <div className="dropdown-trigger">
+        {tag}
+      </div>
+      <div className="dropdown-menu" id="dropdown-menu4" role="menu">
+        <div className="dropdown-content">
+          <div className="dropdown-item">
+            {tooltip}
+          </div>
+        </div>
+      </div>
+    </div>
+  </>
 }

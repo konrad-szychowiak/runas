@@ -189,6 +189,9 @@ export default new Router()
 
 
     //EXAMPLE//
+    /**
+     * @deprecated
+     */
     .post('/:lexeme_id/example', assignExample)
     .delete('/:lexeme_id/example/:example_id', deleteExemplified)
     .get('/:lexeme_id/example', readExamples)

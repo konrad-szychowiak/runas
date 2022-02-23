@@ -1,5 +1,6 @@
 import {pool, sql} from "../db.js";
 import Router from "@koa/router";
+import _ from "lodash";
 
 
 const create = async ctx => {
@@ -52,6 +53,42 @@ const listUseExamples = async ctx => {
     if (result) ctx.body = result
 }
 
+/**
+ * Assign specific lexemes, by their IDs, to a given use example.
+ * @param ctx
+ * @returns {Promise<void>}
+ */
+const assignLexemes = async ctx => {
+    const {example_id} = ctx.params;
+    const {lexemes} = ctx.request.body
+    console.log('  --> DEBUG', example_id, lexemes)
+    const removed = (await pool.query(`delete
+                                       from exemplified_by
+                                       where example = ${example_id}
+                                         and lexeme not in (${lexemes})
+                                       returning lexeme`))
+        .rows
+        .map(el => el.lexeme)
+    const existing = (await pool.query(`select lexeme
+                                        from exemplified_by
+                                        where example = ${example_id};`))
+        .rows
+        .map(el => el.lexeme)
+
+    // console.log(
+    //     (await pool.query(`select f(1, $1)`, [lexemes])).rows
+    // )
+
+    const remaining = _.difference(lexemes, existing)
+    console.log({removed}, {existing}, {remaining})
+    const log = await Promise.all(remaining.flatMap(async lexeme_id => (await pool.query(`insert into exemplified_by (example, lexeme)
+                                                                                          values (${example_id},
+                                                                                                  ${lexeme_id})
+                                                                                          returning *`)).rows))
+    console.log(log)
+    ctx.body = {example: example_id, lexemes: [...existing, ...remaining], removed}
+}
+
 export default new Router()
     // create
     .post('/', create)
@@ -63,3 +100,6 @@ export default new Router()
     .delete('/:example_id', del)
     // list
     .get('/', listUseExamples)
+
+    // assign
+    .post('/:example_id/assign', assignLexemes)

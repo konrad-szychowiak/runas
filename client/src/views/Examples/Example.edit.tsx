@@ -4,10 +4,11 @@ import axios from "axios";
 import {useParams} from "react-router-dom";
 import {useGetAsync} from "../../common/useAsyncState";
 import {ModifiableTextField} from "../../components/ModifiableTextField";
+import {api} from "../../common/api";
 
 export function ExampleEdit() {
   const {example_id: id} = useParams();
-  const {value: example} = useGetAsync(
+  const {value: example, call: getExample} = useGetAsync(
     async () => (await axios.get(`http://localhost:8080/api/example/${id}`)).data,
     {
       dependencies: [id],
@@ -34,10 +35,9 @@ export function ExampleEdit() {
     <pre>{JSON.stringify(example?.usage)}</pre>
 
     <DictionarySearch onSearch={selected => setLexemes(selected)}/>
-    <button className={'button'} onClick={() => {
-      lexemes.forEach(lexeme => {
-        axios.post(`http://localhost:8080/api/lexeme/${lexeme.id}/example/${id}`)
-      })
+    <button className={'button'} onClick={async () => {
+        await api.post(`/example/${id}/assign`, { lexemes: [7, 6] })
+      getExample()
     }}>Assign</button>
   </>
 }
