@@ -73,7 +73,8 @@ const readFull = async (ctx) => {
                                 where lexeme = ${lexeme_id}`
 
     const contexts = (await pool.query(`select name,
-                                               context_id
+                                               context_id,
+                                               description
                                         from contextualised_by
                                                  join context on contextualised_by.context = context.context_id
                                         where contextualised_by.lexeme = ${lexeme_id};`)).rows
@@ -90,7 +91,16 @@ const readFull = async (ctx) => {
                                                    join "group" on belonging."group" = "group".group_id
                                           where belonging.lexeme = ${lexeme_id};`)).rows
 
-    ctx.body = {lexeme_id, definition, part_of_speech: pos_name, lemma, forms: inflected, contexts, examples, groups: belongings}
+    ctx.body = {
+        lexeme_id,
+        definition,
+        part_of_speech: pos_name,
+        lemma,
+        forms: inflected,
+        contexts,
+        examples,
+        groups: belongings
+    }
 }
 
 const assignContext = async ctx => {
@@ -158,7 +168,8 @@ const updateInflectedForm = async ctx => {
     const modified = (await pool.query(`update inflected_form
                                         set category = $1,
                                             spelling = $2
-                                        where lexeme = $3 returning *;`, [category, spelling, lexeme_id])).rows
+                                        where lexeme = $3
+                                        returning *;`, [category, spelling, lexeme_id])).rows
     if (modified) ctx.body = modified
 }
 
@@ -166,7 +177,8 @@ const deleteInflectedForm = async ctx => {
     const {lexeme_id} = ctx.params
     const result = (await pool.query(`delete
                                       from inflected_form
-                                      where lexeme = $1 returning *`, [lexeme_id]))
+                                      where lexeme = $1
+                                      returning *`, [lexeme_id]))
     ctx.body = result
 }
 

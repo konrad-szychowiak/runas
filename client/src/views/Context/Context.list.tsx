@@ -7,20 +7,23 @@ import {ModifiableTextField} from "../../components/ModifiableTextField";
 
 export function ContextList() {
   const [newName, setNewName] = useState('');
+  const [newDescription, setNewDescription] = useState('');
 
   const {
-    value: contextList,
-    call: getContexts
-  } = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/context/`)).data, {
-    dependencies: [],
-    initialCall: true
-  })
+    value: contextList, call: getContexts
+  } = useGetAsync(
+    async () => (await axios.get(`http://localhost:8080/api/context/`)).data,
+    {
+      initialCall: true
+    })
 
   const add = async () => {
     const res = (await axios.post(`http://localhost:8080/api/context/`, {
-      name: newName
+      name: newName,
+      description: newDescription,
     })).data
     setNewName('')
+    setNewDescription('')
     getContexts()
     console.log(res)
   }
@@ -45,7 +48,8 @@ export function ContextList() {
 
     <h1 className="title">List of Contexts</h1>
 
-    <ModifiableTextField initialValue={newName} onValueChange={setNewName} labelText={'New Context'}/>
+    <ModifiableTextField initialValue={newName} onValueChange={setNewName} labelText={'New context name...'}/>
+    <ModifiableTextField initialValue={newDescription} onValueChange={setNewDescription} labelText={'... and its description'}/>
     <button className="button" onClick={() => add()}>Create</button>
 
     <hr/>
@@ -53,8 +57,8 @@ export function ContextList() {
     {contextList && contextList.map(value => <>
         {/*<Context value={value} onDelete={remove}/>*/}
         <ContextUpdate context={value}
-                       onSave={v => {
-                         console.log(v)
+                       onSave={context => {
+                         console.log({context})
                        }}
                        onDelete={remove}/>
       </>

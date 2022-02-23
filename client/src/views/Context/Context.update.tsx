@@ -1,21 +1,31 @@
 import {ContextSchema} from "./schemas";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {LeftRightCard} from "../../components/LeftRightCard";
 import {ModifiableTextField} from "../../components/ModifiableTextField";
+import {api} from "../../common/api";
 
 export function ContextUpdate({
                                 context,
                                 onSave,
                                 onDelete
                               }: { context: ContextSchema, onSave: (value) => void, onDelete: (context) => void }) {
-  const {name} = context
+  const {context_id: id, name, description: origDescription} = context
 
   const [text, setText] = useState(name);
+  const [description, setDescription] = useState(origDescription);
 
+  // useEffect(() => {
+  //   setText(name)
+  //   setDescription(origDescription)
+  // }, [context])
+  //
 
-  const save = () => {
-    alert('TODO')
-    onSave(text)
+  const save = async () => {
+
+    const res = (await api.put('/context', {id, description, name: text})).data
+    alert(JSON.stringify(res))
+
+    onSave(res)
   }
 
   const del = async () => {
@@ -24,8 +34,12 @@ export function ContextUpdate({
 
   return <>
     <LeftRightCard
-      left={
-        <ModifiableTextField initialValue={name} onValueChange={setText} noLabel/>
+      left={<>
+        <div style={{display: "flex", flexDirection: 'row', gap: '.5em'}}>
+          <ModifiableTextField initialValue={text} onValueChange={setText} labelText={'Name'}/>
+          <ModifiableTextField initialValue={description} onValueChange={setDescription} labelText={'Description'}/>
+        </div>
+      </>
       }
       right={
         <>
