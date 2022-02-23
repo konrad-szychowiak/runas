@@ -126,12 +126,9 @@ const deleteBelonging = async ctx => {
 
 const readGroup = async ctx => {
     const {group_id} = ctx.params;
-    try {
-        const result = (await pool.query(`select * from morphological_group where group_id = ${group_id}`)).rows[0]
-    }catch (e){
-        const result = (await pool.query(`select * from semantic_group where group_id = ${group_id}`)).rows[0]
-    }
-    
+    const result = (await pool.query(`select *
+                                      from (case when exists (select * from morphological_group where group_id = ${group_id}) then morphological_group else semantic_group end)
+                                      where group_id = ${group_id}`)).rows[0]
     if (result) ctx.body = result;
 }
 
