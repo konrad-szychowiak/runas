@@ -6,13 +6,11 @@ import {Link} from "react-router-dom";
 
 export function ExampleList() {
   const [text, setText] = useState('');
-  const {
-    value,
-    call: getValue
-  } = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/example/`)).data, {
-    dependencies: [],
-    initialCall: true
-  })
+  const {value, call: getValue} = useGetAsync(
+    async () => (await axios.get(`http://localhost:8080/api/example/`)).data,
+    {
+      initialCall: true
+    })
 
   const createUseExample = async () => {
     await axios.post(`http://localhost:8080/api/example/`, {text})
@@ -54,7 +52,6 @@ export function ExampleList() {
             </>}/>
 
           <div className="message">
-
 
 
           </div>

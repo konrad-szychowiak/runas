@@ -2,7 +2,7 @@ import {ContextSchema} from "./schemas";
 import React, {useEffect, useState} from "react";
 import {LeftRightCard} from "../../components/LeftRightCard";
 import {ModifiableTextField} from "../../components/ModifiableTextField";
-import {api} from "../../common/api";
+import {api, error$alert} from "../../common/api";
 
 export function ContextUpdate({
                                 context,
@@ -22,10 +22,14 @@ export function ContextUpdate({
 
   const save = async () => {
 
-    const res = (await api.put('/context', {id, description, name: text})).data
-    alert(JSON.stringify(res))
-
-    onSave(res)
+    try {
+      const res = (await api.put('/context', {id, description, name: text})).data
+      // alert(JSON.stringify(res))
+      onSave(res)
+    }
+    catch (e) {
+      error$alert(e)
+    }
   }
 
   const del = async () => {

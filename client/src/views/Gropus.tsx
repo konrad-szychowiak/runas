@@ -2,6 +2,7 @@ import React from "react";
 import {useGetAsync} from "../common/useAsyncState";
 import axios from "axios";
 import {Link} from "react-router-dom";
+import {error$alert} from "../common/api";
 
 enum Group {
   Morph,
@@ -13,8 +14,14 @@ const element = (groupSubtype) => (/* props */) => {
   const {
     value,
     call: getValue
-  } = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/${groupSubtype}/`)).data, {
-    dependencies: [],
+  } = useGetAsync(async () => {
+    try {
+    return (await axios.get(`http://localhost:8080/api/${groupSubtype}/`)).data
+    }
+    catch (e) {
+      error$alert(e);
+    }
+  }, {
     initialCall: true
   })
 

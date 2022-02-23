@@ -4,6 +4,7 @@ import axios from "axios";
 import {ContextSchema} from "./schemas";
 import {ContextUpdate} from "./Context.update";
 import {ModifiableTextField} from "../../components/ModifiableTextField";
+import {error$alert} from "../../common/api";
 
 export function ContextList() {
   const [newName, setNewName] = useState('');
@@ -29,9 +30,14 @@ export function ContextList() {
   }
 
   const remove = async ({context_id: id}: ContextSchema) => {
-    const res = (await axios.delete(`http://localhost:8080/api/context/${id}`)).data
-    getContexts()
-    console.log(res)
+    try {
+      const res = (await axios.delete(`http://localhost:8080/api/context/${id}`)).data
+      console.log(res)
+    } catch (e) {
+      error$alert(e)
+    } finally {
+      getContexts()
+    }
   }
 
   return <>
@@ -49,7 +55,8 @@ export function ContextList() {
     <h1 className="title">List of Contexts</h1>
 
     <ModifiableTextField initialValue={newName} onValueChange={setNewName} labelText={'New context name...'}/>
-    <ModifiableTextField initialValue={newDescription} onValueChange={setNewDescription} labelText={'... and its description'}/>
+    <ModifiableTextField initialValue={newDescription} onValueChange={setNewDescription}
+                         labelText={'... and its description'}/>
     <button className="button" onClick={() => add()}>Create</button>
 
     <hr/>

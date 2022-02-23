@@ -46,7 +46,7 @@ const read = async ctx => {
 }
 
 const readFull = async (ctx) => {
-    read(ctx);
+    // read(ctx);
     const {lexeme_id} = ctx.request.params;
     const [lex] = await sql`select *
                             from lexeme
@@ -63,14 +63,15 @@ const readFull = async (ctx) => {
                                 where word_id = ${spelling}
                                 limit 1`;
 
-    const inflected = await sql`SELECT name,
+    const inflected = (await pool.query(`SELECT name,
                                        s.spelling as form,
                                        category,
                                        lexeme
                                 FROM paradigm_category
                                          JOIN inflected_form i ON paradigm_category.category_id = i.category
                                          JOIN spelling s ON s.word_id = i.spelling
-                                where lexeme = ${lexeme_id}`
+                                where lexeme = ${lexeme_id}
+                                order by category`)).rows
 
     const contexts = (await pool.query(`select name,
                                                context_id,
