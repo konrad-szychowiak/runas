@@ -127,26 +127,57 @@ from "group" g
          join semantic_group mg using (group_id);
 
 --procedures
-use master
-go
+CREATE OR REPLACE PROCEDURE dbo.SearchThroughTables	(@SearchStr nvarchar(100))
+AS
+BEGIN
+CREATE TABLE #Results (ColumnName nvarchar(370), ColumnValue nvarchar(3630))
 
-create procedure dbo.FindStringInTable @stringToFind VARCHAR (max), @schema sysname, @table sysname
-AS 
+    SET NOCOUNT ON
 
-set NOCOUNT on 
+DECLARE @TableName nvarchar(256), @ColumnName nvarchar(128), @SearchStr2 nvarchar(110)
+	SET  @TableName = ''
+	SET @SearchStr2 = QUOTENAME('%' + @SearchStr + '%','''')
 
-begin TRY
-    declare @sqlCommand varchar(max) = 'select * from [' + @schema + '].[' + @table + '] WHERE'
-    
-    select @sqlCommand = sqlCommand + '[' + COLUMN_NAME + '] LIKE ''' + @stringToFind + ''' or '
-    from INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = @schema and TABLE_NAME = @table and DATA_TYPE in ('char', 'nchar', 'ntext', 'nvarchar', 'text', 'varchar')
+	WHILE @TableName IS NOT NULL
+BEGIN
+		SET @ColumnName = ''
+		SET @TableName = 
+		(
+			SELECT MIN(QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME))
+			FROM 	INFORMATION_SCHEMA.TABLES
+			WHERE 		TABLE_TYPE = 'BASE TABLE'
+				AND	QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME) > @TableName
+				AND	OBJECTPROPERTY(
+						OBJECT_ID(
+							QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME)
+							 ), 'IsMSShipped'
+						       ) = 0
+		)
 
-    set @sqlCommand = left(@sqlCommand, len(@sqlCommand) - 3)
-    exec(@sqlCommand)
-    print @sqlCommand
-END TRY
+		WHILE (@TableName IS NOT NULL) AND (@ColumnName IS NOT NULL)
+BEGIN
+			SET @ColumnName =
+			(
+				SELECT MIN(QUOTENAME(COLUMN_NAME))
+				FROM 	INFORMATION_SCHEMA.COLUMNS
+				WHERE 		TABLE_SCHEMA	= PARSENAME(@TableName, 2)
+					AND	TABLE_NAME	= PARSENAME(@TableName, 1)
+					AND	DATA_TYPE IN ('char', 'varchar', 'nchar', 'nvarchar')
+					AND	QUOTENAME(COLUMN_NAME) > @ColumnName
+			)
+	
+			IF @ColumnName IS NOT NULL
+BEGIN
+INSERT INTO #Results
+    EXEC
+    (
+					'SELECT ''' + @TableName + '.' + @ColumnName + ''', LEFT(' + @ColumnName + ', 3630) 
+					FROM ' + @TableName + ' (NOLOCK) ' +
+					' WHERE ' + @ColumnName + ' LIKE ' + @SearchStr2
+				)
+END
+END
+END
 
-begin CATCH
-    print 'There was and error. Check to make sure object exists.'
-    print error_message()
-end catch
+SELECT ColumnName, ColumnValue FROM #Results
+END
