@@ -2,24 +2,29 @@ import React, {useEffect, useState} from 'react';
 import axios from "axios";
 import {useGetAsync} from "../../common/useAsyncState";
 import {ContextCheckbox} from "../../components/ContextCheckbox";
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {ModifiableTextField} from "../../components/ModifiableTextField";
-import _ from 'lodash';
+import {api, error$alert} from "../../common/api";
+import {LeftRightCard} from "../../components/LeftRightCard";
 
 
 function FormsEditor({forms}: { forms: { name: string, form: string, lexeme: number, category: number }[] }) {
-  const [table, setTable] = useState({})
-  const [ids, setIDs] = useState({})
+  const [table, setTable] = useState<object>({})
+  const [ids, setIDs] = useState<object>({})
+
   useEffect(() => {
+    let tab = {}
+    let idents = {}
     forms.forEach(form => {
-      setTable({...table, [form.name]: form.form})
+      const {name, category, lexeme, form: text} = form
+      tab = {...tab, [name]: text}
+      idents = {...idents, [name]: {category, lexeme}}
     })
-    forms.forEach(({name, category, lexeme}) => {
-      setIDs({...table, [name]: {category, lexeme}})
-    })
+    setTable(tab)
+    setIDs(idents)
   }, [forms])
 
-  const saveInflected = async (lexeme, category, spelling) => {
+  const updateInflected = async ({lexeme, category, spelling}) => {
     await axios.post(`http://localhost:8080/api/lexeme/${lexeme}/inflected/`,
       {
         category,
@@ -28,10 +33,14 @@ function FormsEditor({forms}: { forms: { name: string, form: string, lexeme: num
   }
 
   const save = async () => {
-    // todo
-    const merged = Object.keys(ids).map(key => ({ spelling: table[key], ...ids[key] }))
-    console.log(merged)
-    alert('TODO: ' + JSON.stringify(merged))
+    try {
+      const merged = Object.keys(ids).map(key => ({spelling: table[key], ...ids[key]}))
+      alert('TODO: ' + JSON.stringify(merged))
+      await Promise.all(merged.map(form => updateInflected(form)))
+    }
+    catch (e) {
+      error$alert(e)
+    }
   }
 
   return <>
@@ -39,11 +48,11 @@ function FormsEditor({forms}: { forms: { name: string, form: string, lexeme: num
       <div className={'field'} key={name}>
         <label className={'label'} htmlFor={`def-${name}`}>{name}:</label>
         <input className={'input'} id={`def-${name}`} type="text"
-          value={table[name]}
-          onChange={e => {
-            const value = e.target.value
-            setTable(v => ({...v, [name]: value}))
-          }}
+               value={table[name]}
+               onChange={e => {
+                 const value = e.target.value
+                 setTable(v => ({...v, [name]: value}))
+               }}
         />
       </div>
     </>)}
@@ -141,12 +150,14 @@ export const LexemeUpdate = () => {
 
   return (
     <>
-      <div className={'section'}>
-        <h1 className={'title'}>🧙 LEXEME / update</h1>
+      <div className={''}>
+        <LeftRightCard noCard
+                       left={<h1 className={'title'}>🧙 Entry / Update</h1>}
+                       right={<Link to={`/lexeme/${id}`}>
+                         <button className="button">Back to the entry</button>
+                       </Link>}/>
 
-        {/*<pre>{JSON.stringify(lexeme)}</pre>*/}
 
-        {/* POS */}
         <div className={'field block'}>
           <label className={'label'} htmlFor="dog-names">Part of Speech</label>
           <div className="tags">
@@ -173,14 +184,21 @@ export const LexemeUpdate = () => {
             <ModifiableTextField initialValue={definition} onValueChange={setDefinition}
                                  labelText={'Definition (varchar 50)'}/>
             <button className={'button is-primary'}
-                    onClick={() => alert('TODO')}>Update Definition
+                    onClick={async () => {
+                      try {
+                        const res = (await api.put('/lexeme/def', {id, definition}))
+                        console.log(res)
+                      } catch (e) {
+                        error$alert(e)
+                      }
+                    }}>Update Definition
             </button>
 
             <hr/>
 
             <div className="field block">
               <label className={'label'}>Contexts</label>
-              <div style={{display: 'flex', flexDirection: 'row'}}>
+              <div style={{display: 'flex', flexDirection: 'row', flexWrap: "wrap"}}>
                 {contexts && contexts.map(context => <ContextCheckbox
                   onAdd={(id) => {
                     setSelectedContexts([...selectedContexts, id])
@@ -194,7 +212,7 @@ export const LexemeUpdate = () => {
               </div>
             </div>
             <button className={'button is-primary'}
-                    onClick={() => alert('TODO')}>Update Contexts
+                    onClick={() => alert(JSON.stringify(selectedContexts))}>Update Contexts
             </button>
           </div>
 

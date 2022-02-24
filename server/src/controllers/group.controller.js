@@ -63,7 +63,10 @@ const createMorphologicalGroup = async ctx => {
     const result = (await pool.query(`insert into morphological_group (group_id, core)
                                       values ($1, $2)
                                       returning *`, [groupID, core])).rows
-    console.log(result)
+    const assigned = (await pool.query(`insert into belonging (lexeme, "group")
+                                        VALUES (${core}, ${groupID})
+                                        returning *`)).rows
+    console.log(result, assigned)
     ctx.body = {id: groupID, status_verbose: "Added"}
 }
 

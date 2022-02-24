@@ -1,4 +1,4 @@
-import {pool, sql} from "../db.js";
+import {pool} from "../db.js";
 import Router from "@koa/router";
 
 
@@ -37,7 +37,8 @@ const update = async ctx => {
     const {description, name} = ctx.request.body;
     console.log(ctx.request.body)
     const modified = (await pool.query(`update part_of_speech
-                                        set description = $1, name = $3
+                                        set description = $1,
+                                            name        = $3
                                         where pos_id = $2
                                         returning *;`, [description, pos_id, name])).rows
     if (modified) ctx.body = modified;
@@ -85,12 +86,13 @@ const delCategory = async ctx => {
 
 const updateCategory = async ctx => {
     const {pos_id, category_id} = ctx.params;
-    const {part_of_speech} = ctx.request.body;
+    // const {part_of_speech} = ctx.request.body;
     const {name} = ctx.request.body;
     const modified = (await pool.query(`update paradigm_category
-                                        set part_of_speech = $1,
-                                            name           = $2
-                                        where pos_id = $3, category_id = $4 returning *`, [part_of_speech, name, pos_id, category_id])).rows
+                                        set name = $1
+                                        where part_of_speech = ${pos_id}
+                                          and category_id = ${category_id}
+                                        returning *`, [name])).rows
     if (modified) ctx.body = modified;
 }
 

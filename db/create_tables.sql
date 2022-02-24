@@ -1,6 +1,6 @@
 drop table if exists belonging;
-drop table if exists syntactic_group;
-drop table if exists morphological_group;
+drop table if exists semantic_group cascade ;
+drop table if exists morphological_group cascade ;
 drop table if exists "group";
 drop table if exists inflected_form;
 drop table if exists exemplified_by;
@@ -38,8 +38,8 @@ create table paradigm_category
 create table lexeme
 (
     lexeme_id      serial primary key,
-    part_of_speech int references part_of_speech (pos_id),
-    spelling       int references spelling (word_id),
+    part_of_speech int references part_of_speech (pos_id) on delete cascade,
+    spelling       int references spelling (word_id) on delete cascade,
     definition     varchar(50) not null
 );
 

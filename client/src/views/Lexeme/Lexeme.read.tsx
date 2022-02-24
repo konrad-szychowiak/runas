@@ -3,12 +3,18 @@ import {Link, useParams} from "react-router-dom";
 import {useGetAsync} from "../../common/useAsyncState";
 import axios from "axios";
 import {LexemeUsages} from "../../components/LexemeUsages";
-import {Tooltip} from "@primer/react";
+import {api, error$alert} from "../../common/api";
 
 export function LexemeRead() {
   const {lexeme_id: id} = useParams()
 
-  const {value} = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/lexeme/${id}/full`)).data, {
+  const {value} = useGetAsync(async () => {
+    try {
+      return (await axios.get(`http://localhost:8080/api/lexeme/${id}/full`)).data
+    } catch (e) {
+      error$alert(e)
+    }
+  }, {
     dependencies: [id],
     initialCall: true
   })
@@ -28,7 +34,12 @@ export function LexemeRead() {
             <button className="button ml-2 is-primary">Update</button>
           </Link>
           <button className="button ml-2 is-danger" onClick={async () => {
-            await axios.delete(`http://localhost:8080/api/lexeme/${id}`)
+            try {
+              await api.delete(`http://localhost:8080/api/lexeme/${id}`)
+              window.history.back()
+            } catch (e) {
+              error$alert(e)
+            }
           }}>Delete
           </button>
         </div>

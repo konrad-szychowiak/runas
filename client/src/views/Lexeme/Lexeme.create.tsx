@@ -3,6 +3,7 @@ import axios from "axios";
 import {useGetAsync} from "../../common/useAsyncState";
 import {ContextCheckbox} from "../../components/ContextCheckbox";
 import {ModifiableTextField} from "../../components/ModifiableTextField";
+import {Link} from "react-router-dom";
 
 
 function SelectPOS(props: { onChange: (value) => void }) {
@@ -168,7 +169,8 @@ export const Creator = () => {
 
       {reqSpelling && (<>
           <div className={'notification is-success'}>
-            {reqSpelling}
+            New lexeme created! You can see it <Link to={`/lexeme/${JSON.parse(reqSpelling).lexeme_id}`}>here</Link>
+            {/*{reqSpelling}*/}
           </div>
         </>
       )}

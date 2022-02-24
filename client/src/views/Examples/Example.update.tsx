@@ -4,7 +4,7 @@ import axios from "axios";
 import {useParams} from "react-router-dom";
 import {useGetAsync} from "../../common/useAsyncState";
 import {ModifiableTextField} from "../../components/ModifiableTextField";
-import {api} from "../../common/api";
+import {api, error$alert} from "../../common/api";
 import {LeftRightCard} from "../../components/LeftRightCard";
 import {GoBackButton} from "../Group/SemanticGroup.update";
 
@@ -27,7 +27,11 @@ export function ExampleUpdate() {
   }, [example])
 
   const onUpdate = async () => {
-
+    try {
+      await api.put(`/example/${id}`, { text, source })
+    } catch (e) {
+      error$alert(e)
+    }
   }
 
   return <>

@@ -17,6 +17,7 @@ import {UseExample} from './views/Examples';
 import {SemanticGroupCreate} from "./views/Group/SemanticGroup.create";
 import {SemanticGroupUpdate} from "./views/Group/SemanticGroup.update";
 import {MorphoGroupCreate} from "./views/Group/MorphoGroup.create";
+import {MorphoGroupUpdate} from "./views/Group/MorphoGroup.update";
 
 ReactDOM.render(
   <HashRouter>
@@ -40,7 +41,7 @@ ReactDOM.render(
             <Route path={'morphological'}>
               <Route path={''} element={<MorphologicalGroup/>}/>
               <Route path={'create'} element={<MorphoGroupCreate/>}/>
-              <Route path={':group_id'} element={<SemanticGroupUpdate/>}/>
+              <Route path={':group_id'} element={<MorphoGroupUpdate/>}/>
             </Route>
 
             <Route path={'semantic'}>

@@ -19,7 +19,7 @@ export function POSList() {
 
         <div className="level-right">
           <Link to="/design/pos/create">
-            <button className="button is-info">Create</button>
+            <button className="button is-info">Create New</button>
           </Link>
         </div>
       </div>

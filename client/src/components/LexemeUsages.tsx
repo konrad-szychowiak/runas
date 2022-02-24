@@ -8,8 +8,9 @@ export function LexemeUsages(props: { lexeme: any }) {
       {props.lexeme?.examples?.map(({text, source}) =>
         <>
           <li>
-            <q>{text}</q>
-            <a href={source}>{source}</a>
+            <p>
+              <q>{text}</q> <small>based on:</small> <span className={'tag is-small is-link is-light'}>{source}</span>
+            </p>
           </li>
         </>
       )}

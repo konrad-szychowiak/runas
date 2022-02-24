@@ -13,7 +13,7 @@ export function POSRead({value}: { value: PartOfSpeech }) {
           </div>
           <div className="level-right">
             <Link to={`${value.pos_id}`}>
-              <button className={'button'}>Edit</button>
+              <button className={'button is-primary'}>Edit</button>
             </Link>
 
           </div>

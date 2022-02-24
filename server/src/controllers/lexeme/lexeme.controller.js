@@ -48,30 +48,30 @@ const read = async ctx => {
 const readFull = async (ctx) => {
     // read(ctx);
     const {lexeme_id} = ctx.request.params;
-    const [lex] = await sql`select *
-                            from lexeme
-                            where lexeme_id = ${lexeme_id}`
+    const [lex] = (await pool.query(`select *
+                                     from lexeme
+                                     where lexeme_id = ${lexeme_id}`)).rows
 
     const {part_of_speech, spelling, definition} = lex;
 
-    const [pos_name] = await sql`select *
-                                 from part_of_speech
-                                 where pos_id = ${part_of_speech}`;
+    const [pos_name] = (await pool.query(`select *
+                                          from part_of_speech
+                                          where pos_id = ${part_of_speech}`)).rows
 
-    const [{lemma}] = await sql`select spelling.spelling as lemma
-                                from spelling
-                                where word_id = ${spelling}
-                                limit 1`;
+    const [{lemma}] = (await pool.query(`select spelling.spelling as lemma
+                                         from spelling
+                                         where word_id = ${spelling}
+                                         limit 1`)).rows
 
     const inflected = (await pool.query(`SELECT name,
-                                       s.spelling as form,
-                                       category,
-                                       lexeme
-                                FROM paradigm_category
-                                         JOIN inflected_form i ON paradigm_category.category_id = i.category
-                                         JOIN spelling s ON s.word_id = i.spelling
-                                where lexeme = ${lexeme_id}
-                                order by category`)).rows
+                                                s.spelling as form,
+                                                category,
+                                                lexeme
+                                         FROM paradigm_category
+                                                  JOIN inflected_form i ON paradigm_category.category_id = i.category
+                                                  JOIN spelling s ON s.word_id = i.spelling
+                                         where lexeme = ${lexeme_id}
+                                         order by category`)).rows
 
     const contexts = (await pool.query(`select name,
                                                context_id,
@@ -179,7 +179,19 @@ const deleteInflectedForm = async ctx => {
     const result = (await pool.query(`delete
                                       from inflected_form
                                       where lexeme = $1
-                                      returning *`, [lexeme_id]))
+                                      returning *`, [lexeme_id])).rows
+    ctx.body = result
+}
+
+const updateDefinition = async ctx => {
+    const {id, definition} = ctx.request.body
+    await pool.query(`update lexeme
+                      set definition = $1
+                      where lexeme_id = $2;`, [definition, id])
+    const [result] = (await pool.query(`select *
+                                        from entry
+                                        where id = $1
+                                        limit 1`, [id])).rows
     ctx.body = result
 }
 
@@ -188,6 +200,7 @@ export default new Router()
     .get('/', list)
     .get('/:lexeme_id/full', readFull)
     .delete('/:lexeme_id', del)
+    .put('/def', updateDefinition)
 
     // INFLECTED FORM //
     .post('/:lexeme_id/inflected', createInflectedForm)

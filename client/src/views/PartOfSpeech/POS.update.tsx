@@ -3,6 +3,7 @@ import {useGetAsync} from "../../common/useAsyncState";
 import axios from "axios";
 import React, {useEffect, useState} from "react";
 import {ModifiableTextField} from "../../components/ModifiableTextField";
+import {api, error$alert} from "../../common/api";
 
 export function POSUpdate() {
   const {pos_id: id} = useParams();
@@ -27,24 +28,37 @@ export function POSUpdate() {
   const {name, description} = pos;
 
   const save = async () => {
-    await axios.put(`http://localhost:8080/api/pos/${id}/`,
-      {
-        description: desc,
-        name: title
-      })
-    // window.history.back()
+    try {
+      await axios.put(`http://localhost:8080/api/pos/${id}/`,
+        {
+          description: desc,
+          name: title
+        })
+    } catch (e) {
+      error$alert(e)
+    }
   }
 
   const del = async () => {
-    await axios.delete(`http://localhost:8080/api/pos/${id}/`)
-    getPOS();
+    try {
+      await axios.delete(`http://localhost:8080/api/pos/${id}/`)
+    } catch (e) {
+      error$alert(e)
+    } finally {
+      getPOS();
+    }
     // window.history.back();
   }
 
   const addCat = async () => {
-    await axios.post(`http://localhost:8080/api/pos/${id}/category/`, {name: newCategoryName})
-    setNewCategoryName('')
-    getCategories();
+    try {
+      await axios.post(`http://localhost:8080/api/pos/${id}/category/`, {name: newCategoryName})
+      setNewCategoryName('')
+    } catch (e) {
+      error$alert(e)
+    } finally {
+      getCategories();
+    }
   }
 
   return (<>
@@ -66,17 +80,30 @@ export function POSUpdate() {
       {/*  {description}*/}
       {/*</div>*/}
 
-      <ModifiableTextField initialValue={title} onValueChange={v => setTitle(v)} labelText={'Name'}/>
+      <ModifiableTextField initialValue={title} onValueChange={setTitle} labelText={'Name'}/>
       <ModifiableTextField initialValue={desc} onValueChange={setDesc} labelText={'Description'}/>
 
       <h2 className="subtitle">Governed Categories</h2>
 
-      {/*<div className={'card mb-4'}>*/}
-      {/*  <div className="card-content">*/}
-      <ModifiableTextField initialValue={newCategoryName} onValueChange={setNewCategoryName} labelText={'New Category'}/>
-      <button className="button" onClick={() => addCat()}>Add {newCategoryName}</button>
-      {/*</div>*/}
-      {/*</div>*/}
+      <article className="card message is-primary">
+        <div className="message-header">
+          <p>New Category</p>
+        </div>
+        <div className="message-body">
+          <p className={'mb-2'}>
+            Paradigm Categories are a set of <i><b>abstract</b></i> forms a word belonging to a part of speech can take.
+            <br/>
+            For verbs it might be tense, aspect and mood forms, for nouns it may be number or definiteness—you decide.
+            <br/>
+            For every entry that has this part of speech, you will be asked to provide specific word forms
+            for every paradigm category set here.
+          </p>
+          <ModifiableTextField initialValue={newCategoryName} onValueChange={setNewCategoryName}
+                               labelText={'New Category'}/>
+          <button className="button is-primary" onClick={() => addCat()}>Create</button>
+        </div>
+      </article>
+
 
       {categories && categories.map(el => <>
         <Cat name={el.name}
@@ -101,9 +128,15 @@ function Cat({
                buttonClass = 'button'
              }: { name: string, linkTo: string, id: number, catID: number, buttonText?: string, buttonClass?: string }) {
   const [text, setText] = useState(name);
-  const save = () => {
-    alert('TODO')
+
+  const save = async () => {
+    try {
+      await api.put(`/pos/${id}/category/${catID}`, {name: text})
+    } catch (e) {
+      error$alert(e)
+    }
   }
+
   return <>
     <div className="card mb-4">
       <div className="card-content ">
@@ -112,7 +145,7 @@ function Cat({
             <ModifiableTextField initialValue={name} onValueChange={setText} noLabel/>
           </div>
           <div className="level-right">
-            <button className={'button mr-2'}
+            <button className={'button is-primary mr-2'}
                     onClick={save}>Save Changes
             </button>
             <button className={buttonClass}

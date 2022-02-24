@@ -38,19 +38,19 @@ const element = (groupSubtype) => (/* props */) => {
     <div>
       <div className={'level'}>
         <div className="level-left">
-          <span className="title">Groups</span>
+          <span className="title">Groups ({groupSubtype})</span>
         </div>
 
         <div className="level-right">
           <Link to={`/design/group/${groupSubtype}/create`}>
-            <button className="button is-info">Create</button>
+            <button className="button is-info">Create New</button>
           </Link>
         </div>
       </div>
 
-      <code>{JSON.stringify(value)}</code>
+      {/*<code>{JSON.stringify(value)}</code>*/}
 
-      <hr/>
+      {/*<hr/>*/}
 
       {value && value.map(el => <>
         <LeftRightCard
