@@ -35,8 +35,8 @@ function FormsEditor({forms}: { forms: { name: string, form: string, lexeme: num
   const save = async () => {
     try {
       const merged = Object.keys(ids).map(key => ({spelling: table[key], ...ids[key]}))
-      alert('TODO: ' + JSON.stringify(merged))
       await Promise.all(merged.map(form => updateInflected(form)))
+      alert('Successfully updated the spellings!')
     }
     catch (e) {
       error$alert(e)
@@ -148,6 +148,16 @@ export const LexemeUpdate = () => {
     setReqSpelling(JSON.stringify(lexeme.data))
   }
 
+  async function updateSpelling() {
+    try {
+      const res = (await api.put(`/lexeme/lemma`, {id, lemma})).data
+      alert(JSON.stringify(res))
+    }
+    catch (e) {
+      error$alert(e);
+    }
+  }
+
   return (
     <>
       <div className={''}>
@@ -175,7 +185,7 @@ export const LexemeUpdate = () => {
             {/*LEMMA*/}
             <ModifiableTextField initialValue={lemma} onValueChange={v => setLemma(v)}/>
             <button className={'button is-danger'}
-                    onClick={() => alert('TODO')}>Update Spelling
+                    onClick={async () => await updateSpelling()}>Update Spelling
             </button>
 
             <hr/>

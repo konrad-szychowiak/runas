@@ -197,12 +197,26 @@ const updateDefinition = async ctx => {
     ctx.body = result
 }
 
+const updateLemma = async ctx => {
+    const {id, lemma /* a text */} = ctx.request.body
+    await pool.query(`update lexeme
+                      set spelling = branch_off_spelling($1)
+                      where lexeme_id = $2;`, [lemma, id])
+    const [result] = (await pool.query(`select *
+                                        from entry
+                                        where id = $1
+                                        limit 1`, [id])).rows
+    console.log(result)
+    ctx.body = result
+}
+
 export default new Router()
     .post('/', create)
     .get('/', list)
     .get('/:lexeme_id/full', readFull)
     .delete('/:lexeme_id', del)
     .put('/def', updateDefinition)
+    .put('/lemma', updateLemma)
 
     // INFLECTED FORM //
     .post('/:lexeme_id/inflected', createInflectedForm)
