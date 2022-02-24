@@ -7,6 +7,10 @@ export function POSCreate() {
   const [description, setDescription] = useState('')
 
   const onCreate = async () => {
+    if ( name === '' ) {
+      alert('Please input some values into the required fields!')
+      return;
+    }
     await axios.post(`http://localhost:8080/api/pos/`, {name, description});
     window.history.back();
   }
@@ -14,7 +18,7 @@ export function POSCreate() {
   return <>
     <div className={'card'}>
       <div className={'card-content'}>
-        <input className={"input"} placeholder={'Name'} value={name} onChange={event => setName(event.target.value)}/>
+        <input className={"input"} placeholder={'Name *'} value={name} onChange={event => setName(event.target.value)}/>
         <textarea className={"textarea"} placeholder={'Description'} value={description}
                   onChange={event => setDescription(event.target.value)}/>
         {/*<Link to={'/design/pos/'}>*/}

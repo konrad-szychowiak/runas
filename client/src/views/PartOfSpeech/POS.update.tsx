@@ -22,6 +22,7 @@ export function POSUpdate() {
   useEffect(() => {
     setDesc(description)
     setTitle(name)
+    getCategories()
   }, [pos])
 
   if (!pos) return <></>
@@ -64,9 +65,9 @@ export function POSUpdate() {
   return (<>
       <div className="level">
         <div className="level-left">
-          <span className="title">Part of Speech: {(name === title)
-            ? <q>name</q>
-            : <><s style={{color: 'red'}}><q>{name}</q></s> <q>{title}</q></>}
+          <span className="title">Part of Speech{/*: {(name === title)
+            ? <em>{name}</em>
+            : <><s style={{color: 'red'}}><q>{name}</q></s> <q>{title}</q></>}*/}
           </span>
         </div>
 
@@ -111,7 +112,11 @@ export function POSUpdate() {
              id={el.part_of_speech}
              catID={el.category_id}
              buttonClass={'button is-danger'}
-             buttonText={'Delete'}/>
+             buttonText={'Delete'}
+             onDelete={() => {
+               getPOS()
+             }}
+        />
       </>)}
 
     </>
@@ -119,14 +124,25 @@ export function POSUpdate() {
 }
 
 // fixme
+type CatProps = {
+  name: string,
+  linkTo: string,
+  id: number,
+  catID: number,
+  buttonText?: string,
+  buttonClass?: string,
+  onDelete: Function,
+}
+
 function Cat({
                name,
                id,
                catID,
                linkTo,
                buttonText = 'Edit',
-               buttonClass = 'button'
-             }: { name: string, linkTo: string, id: number, catID: number, buttonText?: string, buttonClass?: string }) {
+               buttonClass = 'button',
+               onDelete
+             }: CatProps) {
   const [text, setText] = useState(name);
 
   const save = async () => {
@@ -150,7 +166,13 @@ function Cat({
             </button>
             <button className={buttonClass}
                     onClick={async () => {
-                      await axios.delete(`http://localhost:8080/api/pos/${id}/category/${catID}`);
+                      try {
+                        await axios.delete(`http://localhost:8080/api/pos/${id}/category/${catID}`);
+                        onDelete()
+                      }
+                      catch (e) {
+                        error$alert(e)
+                      }
                     }}>{buttonText}</button>
           </div>
         </div>

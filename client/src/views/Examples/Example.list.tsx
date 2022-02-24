@@ -16,6 +16,10 @@ export function ExampleList() {
     })
 
   const createUseExample = async () => {
+    if (text === '') {
+      alert('Please input some values into the required field(s)!')
+      return;
+    }
     try {
       await api.post(`/example/`, {text, source})
     } catch (e) {
@@ -41,7 +45,7 @@ export function ExampleList() {
           <p>New Use Example</p>
         </div>
         <div className="message-body">
-          <ModifiableTextField initialValue={text} onValueChange={setText} labelText={"Text"}/>
+          <ModifiableTextField initialValue={text} onValueChange={setText} labelText={"Text [required]"}/>
           <ModifiableTextField initialValue={source} onValueChange={setSource} labelText={"Source"}/>
           <button className="button is-primary"
                   onClick={() => createUseExample()}>Create
@@ -55,8 +59,8 @@ export function ExampleList() {
             left={<>
               <div>
                 <p><strong><q>{el.text}</q></strong></p>
-                 <p>
-                    from: {el.source_ref ? <code>{el.source_ref}</code> : <i>unknown</i>}
+                <p>
+                  from: {el.source_ref ? <code>{el.source_ref}</code> : <i>unknown</i>}
                 </p>
                 {/*<code>{JSON.stringify(el)}</code>*/}
               </div>
