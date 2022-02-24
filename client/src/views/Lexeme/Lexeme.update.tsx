@@ -25,7 +25,7 @@ function FormsEditor({forms}: { forms: { name: string, form: string, lexeme: num
   }, [forms])
 
   const updateInflected = async ({lexeme, category, spelling}) => {
-    await axios.post(`http://localhost:8080/api/lexeme/${lexeme}/inflected/`,
+    await axios.put(`http://localhost:8080/api/lexeme/${lexeme}/inflected/`,
       {
         category,
         spelling

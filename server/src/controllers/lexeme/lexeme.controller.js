@@ -164,12 +164,14 @@ const readExamples = async ctx => {
 const updateInflectedForm = async ctx => {
     const {lexeme_id} = ctx.params
     const {category} = ctx.request.body
-    const {spelling} = ctx.request.body
+    const {spelling /* that's a text */} = ctx.request.body
+
+    console.log(category, spelling)
 
     const modified = (await pool.query(`update inflected_form
-                                        set category = $1,
-                                            spelling = $2
+                                        set spelling = branch_off_spelling($2)
                                         where lexeme = $3
+                                          and category = $1
                                         returning *;`, [category, spelling, lexeme_id])).rows
     if (modified) ctx.body = modified
 }

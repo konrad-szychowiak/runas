@@ -119,7 +119,7 @@ export const Creator = () => {
   }
 
   return (
-    <div className={'section'}>
+    <div className={''}>
       <h1 className={'title'}>🧙 Entry / Create</h1>
 
       <SelectPOS onChange={value => setSelectedPOS(value)}/>
