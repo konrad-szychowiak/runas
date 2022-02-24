@@ -1,7 +1,7 @@
 import {ExampleList} from "./Example.list";
-import {ExampleEdit} from "./Example.edit";
+import {ExampleUpdate} from "./Example.update";
 
 export const UseExample = {
   List: ExampleList,
-  Edit: ExampleEdit
+  Edit: ExampleUpdate
 }

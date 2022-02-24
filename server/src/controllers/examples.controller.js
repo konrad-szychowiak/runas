@@ -4,10 +4,10 @@ import _ from "lodash";
 
 
 const create = async ctx => {
-    const {text, source_ref} = ctx.request.body;
+    const {text, source} = ctx.request.body;
     const result = (await pool.query(`insert into use_example ("text", "source_ref")
                                       values ($1, $2)
-                                      returning example_id;`, [text, source_ref])).rows[0]
+                                      returning example_id;`, [text, source])).rows[0]
     if (result) ctx.body = result;
 }
 
@@ -27,13 +27,13 @@ const readUseExampleById = async (ctx) => {
 const update = async ctx => {
     const {example_id} = ctx.params;
     const {text} = ctx.request.body;
-    const {source_ref} = ctx.request.body;
+    const {source} = ctx.request.body;
     console.log(ctx.request.body)
     const modified = (await pool.query(`update use_example
                                         set text       = $1,
                                             source_ref = $2
                                         where example_id = $3
-                                        returning *;`, [text, source_ref, example_id])).rows
+                                        returning *;`, [text, source, example_id])).rows
     if (modified) ctx.body = modified;
 }
 
@@ -61,23 +61,23 @@ const listUseExamples = async ctx => {
 const assignLexemes = async ctx => {
     const {example_id} = ctx.params;
     const {lexemes} = ctx.request.body
+
+    console.log(lexemes)
     console.log('  --> DEBUG', example_id, lexemes)
+
     const removed = (await pool.query(`delete
                                        from exemplified_by
                                        where example = ${example_id}
-                                         and lexeme not in (${lexemes})
-                                       returning lexeme`))
+                                         and lexeme != any ($1)
+                                       returning lexeme`, [lexemes]))
         .rows
         .map(el => el.lexeme)
+
     const existing = (await pool.query(`select lexeme
                                         from exemplified_by
                                         where example = ${example_id};`))
         .rows
         .map(el => el.lexeme)
-
-    // console.log(
-    //     (await pool.query(`select f(1, $1)`, [lexemes])).rows
-    // )
 
     const remaining = _.difference(lexemes, existing)
     console.log({removed}, {existing}, {remaining})

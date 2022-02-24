@@ -25,7 +25,7 @@ export function LexemeRead() {
         </div>
         <div className="level-right">
           <Link to={'update'}>
-            <button className="button ml-2 is-info">Update</button>
+            <button className="button ml-2 is-primary">Update</button>
           </Link>
           <button className="button ml-2 is-danger" onClick={async () => {
             await axios.delete(`http://localhost:8080/api/lexeme/${id}`)
@@ -69,7 +69,18 @@ export function LexemeRead() {
 
         <div className="column is-one-third">
           <h2 className="subtitle">This lexeme belongs to</h2>
-          <code>{JSON.stringify(value)}</code>
+
+          {/*<code>{JSON.stringify(value)}</code>*/}
+
+          <ul>
+            {value?.groups.map(el => <>
+              <li>
+                <span className="tag is-link is-small is-light">
+                  {JSON.stringify(el)}
+                </span>
+              </li>
+            </>)}
+          </ul>
         </div>
       </div>
 

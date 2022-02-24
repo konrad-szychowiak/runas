@@ -40,8 +40,8 @@ export function Design() {
               Groups
             </p>
             <ul className="menu-list">
-              <li><Link to={'/design/group/m'}>Morphological Groups</Link></li>
-              <li><Link to={'/design/group/s'}>Semantic Groups</Link></li>
+              <li><Link to={'/design/group/morphological'}>Morphological Groups</Link></li>
+              <li><Link to={'/design/group/semantic'}>Semantic Groups</Link></li>
             </ul>
           </aside>
         </div>

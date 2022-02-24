@@ -8,12 +8,15 @@ import {Lexeme} from "./views/Lexeme";
 import {Design, DesignInfo} from "./views/Design";
 import {DictionaryView} from "./views/DictionaryView";
 import {ExampleList} from "./views/Examples/Example.list";
-import {MorphologicalGroup, SemanticGroup} from "./views/Gropus";
+import {MorphologicalGroup, SemanticGroup} from "./views/Group/Group.list";
 import {LexemeUpdate} from "./views/Lexeme/Lexeme.update";
 import {PartOfSpeech} from './views/PartOfSpeech';
 import {Context} from './views/Context';
 import {POSList} from "./views/PartOfSpeech/POS.list";
 import {UseExample} from './views/Examples';
+import {SemanticGroupCreate} from "./views/Group/SemanticGroup.create";
+import {SemanticGroupUpdate} from "./views/Group/SemanticGroup.update";
+import {MorphoGroupCreate} from "./views/Group/MorphoGroup.create";
 
 ReactDOM.render(
   <HashRouter>
@@ -31,11 +34,20 @@ ReactDOM.render(
           <Route path={'context'} element={<Context.List/>}/>
           <Route path={'examples'}>
             <Route path={''} element={<UseExample.List/>}/>
-            <Route path={':example_id'} element={<UseExample.Edit />} />
+            <Route path={':example_id'} element={<UseExample.Edit/>}/>
           </Route>
           <Route path={'group'}>
-            <Route path={'m'} element={<MorphologicalGroup/>}/>
-            <Route path={'s'} element={<SemanticGroup/>}/>
+            <Route path={'morphological'}>
+              <Route path={''} element={<MorphologicalGroup/>}/>
+              <Route path={'create'} element={<MorphoGroupCreate/>}/>
+              <Route path={':group_id'} element={<SemanticGroupUpdate/>}/>
+            </Route>
+
+            <Route path={'semantic'}>
+              <Route path={''} element={<SemanticGroup/>}/>
+              <Route path={'create'} element={<SemanticGroupCreate/>}/>
+              <Route path={':group_id'} element={<SemanticGroupUpdate/>}/>
+            </Route>
           </Route>
         </Route>
         <Route path={'lexeme'}>

@@ -7,7 +7,7 @@ drop table if exists exemplified_by;
 drop table if exists use_example;
 drop table if exists contextualised_by;
 drop table if exists context;
-drop table if exists lexeme;
+drop table if exists lexeme cascade;
 drop table if exists paradigm_category;
 drop table if exists part_of_speech;
 drop table if exists spelling;

@@ -41,25 +41,37 @@ export function ContextList() {
   }
 
   return <>
-    <article className="message is-info">
-      <div className="message-header">
-        <p>Contexts?</p>
-      </div>
-      <div className="message-body">
-        Context are short labels intended to quickly identify how a lexeme (a word) is used.
-        Most common usage would be marking a lexeme as restricted to specific area of life (technical, medical, etc.),
-        or some demographics (older speakers, youth slang, etc.).
-      </div>
-    </article>
-
     <h1 className="title">List of Contexts</h1>
 
-    <ModifiableTextField initialValue={newName} onValueChange={setNewName} labelText={'New context name...'}/>
-    <ModifiableTextField initialValue={newDescription} onValueChange={setNewDescription}
-                         labelText={'... and its description'}/>
-    <button className="button" onClick={() => add()}>Create</button>
+    <article className="card message is-primary">
+      <div className="message-header">
+        <p>New Context</p>
+      </div>
+      <div className="message-body">
+        <p className={'mb-2'}>
+          Context are short labels intended to quickly identify how a lexeme (a word) is used.
+          Most common usage would be marking a lexeme as restricted to specific area of life (technical, medical, etc.),
+          or some demographics (older speakers, youth slang, etc.).
+        </p>
 
-    <hr/>
+        <div className="columns">
+          <div className="column">
+            <ModifiableTextField labelText={'New context name...'}
+                                 initialValue={newName}
+                                 onValueChange={setNewName}/>
+          </div>
+
+          <div className="column">
+            <ModifiableTextField labelText={'... and its description'}
+                                 initialValue={newDescription}
+                                 onValueChange={setNewDescription}/>
+          </div>
+        </div>
+
+        <button className="button is-primary" onClick={() => add()}>Create</button>
+
+      </div>
+    </article>
 
     {contextList && contextList.map(value => <>
         {/*<Context value={value} onDelete={remove}/>*/}
@@ -70,5 +82,7 @@ export function ContextList() {
                        onDelete={remove}/>
       </>
     )}
+
+
   </>
 }
