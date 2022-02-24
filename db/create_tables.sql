@@ -1,5 +1,7 @@
+drop view if exists full_semantic_group_view;
+drop view if exists full_morphological_group_view;
 drop table if exists belonging;
-drop table if exists syntactic_group;
+drop table if exists semantic_group;
 drop table if exists morphological_group;
 drop table if exists "group";
 drop table if exists inflected_form;
@@ -7,7 +9,7 @@ drop table if exists exemplified_by;
 drop table if exists use_example;
 drop table if exists contextualised_by;
 drop table if exists context;
-drop table if exists lexeme;
+drop table if exists lexeme cascade;
 drop table if exists paradigm_category;
 drop table if exists part_of_speech;
 drop table if exists spelling;
@@ -38,7 +40,7 @@ create table paradigm_category
 create table lexeme
 (
     lexeme_id      serial primary key,
-    part_of_speech int references part_of_speech (pos_id),
+    part_of_speech int references part_of_speech (pos_id) on delete cascade,
     spelling       int references spelling (word_id),
     definition     varchar(50) not null
 );
@@ -108,7 +110,6 @@ create table belonging
 
 -- views
 
-drop view if exists full_morphological_group_view;
 create view full_morphological_group_view as
 select group_id        as id,
        description,
@@ -117,7 +118,7 @@ select group_id        as id,
 from "group" g
          join morphological_group mg using (group_id);
 
-drop view if exists full_semantic_group_view;
+
 create view full_semantic_group_view as
 select group_id   as id,
        description,
@@ -125,6 +126,7 @@ select group_id   as id,
        'semantic' as group_type
 from "group" g
          join semantic_group mg using (group_id);
+
 
 --procedures
 CREATE OR REPLACE PROCEDURE dbo.SearchThroughTables	(@SearchStr nvarchar(100))
