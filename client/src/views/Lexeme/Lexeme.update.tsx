@@ -37,8 +37,7 @@ function FormsEditor({forms}: { forms: { name: string, form: string, lexeme: num
       const merged = Object.keys(ids).map(key => ({spelling: table[key], ...ids[key]}))
       await Promise.all(merged.map(form => updateInflected(form)))
       alert('Successfully updated the spellings!')
-    }
-    catch (e) {
+    } catch (e) {
       error$alert(e)
     }
   }
@@ -89,6 +88,8 @@ export const LexemeUpdate = () => {
     setLemma(lexeme?.lemma)
     setDefinition(lexeme?.definition)
     setSelectedPOS(lexeme?.part_of_speech)
+    const ctxs = lexeme?.contexts?.map(el => el.context_id)
+    setSelectedContexts(ctxs)
     lexeme?.forms.forEach(form => {
       setCategoriesInput({...categoriesInput, [form.name]: form.form})
     })
@@ -152,8 +153,7 @@ export const LexemeUpdate = () => {
     try {
       const res = (await api.put(`/lexeme/lemma`, {id, lemma})).data
       alert(JSON.stringify(res))
-    }
-    catch (e) {
+    } catch (e) {
       error$alert(e);
     }
   }
@@ -192,12 +192,11 @@ export const LexemeUpdate = () => {
 
             {/*DEFINITION*/}
             <ModifiableTextField initialValue={definition} onValueChange={setDefinition}
-                                 labelText={'Definition (varchar 50)'}/>
+                                 labelText={'Definition'}/>
             <button className={'button is-primary'}
                     onClick={async () => {
                       try {
                         const res = (await api.put('/lexeme/def', {id, definition}))
-                        console.log(res)
                       } catch (e) {
                         error$alert(e)
                       }
@@ -206,10 +205,12 @@ export const LexemeUpdate = () => {
 
             <hr/>
 
+            {/*<code>{JSON.stringify(selectedContexts)}</code>*/}
+
             <div className="field block">
               <label className={'label'}>Contexts</label>
               <div style={{display: 'flex', flexDirection: 'row', flexWrap: "wrap"}}>
-                {contexts && contexts.map(context => <ContextCheckbox
+                {contexts && contexts.map(context => <><ContextCheckbox
                   onAdd={(id) => {
                     setSelectedContexts([...selectedContexts, id])
                     console.log(selectedContexts)
@@ -218,11 +219,21 @@ export const LexemeUpdate = () => {
                     setSelectedContexts(selectedContexts.filter(el => el !== id))
                     console.log(selectedContexts)
                   }}
-                  context={context}/>)}
+                  initiallySelected={selectedContexts?.includes(context.context_id)}
+                  context={context}/>
+                  {/*{JSON.stringify(context)}*/}
+                </>)}
               </div>
             </div>
             <button className={'button is-primary'}
-                    onClick={() => alert(JSON.stringify(selectedContexts))}>Update Contexts
+                    onClick={async () => {
+                      try {
+                        const res = (await api.put(`/lexeme/${id}/context/`, {contexts: selectedContexts})).data
+                        alert(`Updated!`)
+                      } catch (e) {
+                        error$alert(e)
+                      }
+                    }}>Update Contexts
             </button>
           </div>
 

@@ -83,15 +83,17 @@ export function LexemeRead() {
 
           {/*<code>{JSON.stringify(value)}</code>*/}
 
-          <ul>
+          <div className={'tags'}>
             {value?.groups.map(el => <>
-              <li>
-                <span className="tag is-link is-small is-light">
+              <Link to={`/group/${el.group_id}`}>
+                <TooltipTag tag={<span className="tag is-link is-small is-light mr-2">
+                  {el.description}
+                </span>} tooltip={<>
                   {JSON.stringify(el)}
-                </span>
-              </li>
+                </>}/>
+              </Link>
             </>)}
-          </ul>
+          </div>
         </div>
       </div>
 

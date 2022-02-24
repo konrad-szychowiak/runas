@@ -1,5 +1,6 @@
 import {pool, sql} from "../../db.js";
 import Router from "@koa/router";
+import _ from "lodash";
 
 const list = async (ctx) => {
     // TODO
@@ -10,7 +11,7 @@ const list = async (ctx) => {
 }
 
 const create = async (ctx) => {
-    const {spelling, pos, definition} = ctx.request.body
+    const {spelling /* text */, pos, definition} = ctx.request.body
     if (!spelling || !pos || !definition) {
         ctx.status = 400;
         return;
@@ -19,7 +20,7 @@ const create = async (ctx) => {
     console.log({spelling, pos, definition});
 
     const [id] = await sql`insert into lexeme (part_of_speech, spelling, definition)
-                           values (${pos}, ${spelling}, ${definition})
+                           values (${pos}, branch_off_spelling(${spelling}), ${definition})
                            returning lexeme_id;`
     const {lexeme_id} = id;
 
@@ -29,9 +30,9 @@ const create = async (ctx) => {
 const createInflectedForm = async (ctx) => {
     const {lexeme_id} = ctx.request.params;
     const {category, spelling} = ctx.request.body;
-    const [inflected_form] = (await pool.query(`insert into inflected_form (lexeme, category, spelling)
-                                                values (${lexeme_id}, ${category}, ${spelling})
-                                                returning *;`)).rows
+    const [inflected_form] = (await pool.query(`insert into inflected_form (lexeme, category, "spelling")
+                                                values (${lexeme_id}, ${category}, branch_off_spelling($1))
+                                                returning *;`, [spelling])).rows
     ctx.body = inflected_form
 }
 
@@ -210,6 +211,24 @@ const updateLemma = async ctx => {
     ctx.body = result
 }
 
+const updateContexts = async ctx => {
+    const {lexeme_id} = ctx.params;
+    const {contexts} = ctx.request.body
+
+    await pool.query(`delete
+                      from contextualised_by
+                      where context = any ($1)
+                        and lexeme = ${lexeme_id}
+                      returning lexeme`, [contexts])
+
+    const done = await Promise.all(contexts.flatMap(async contextID => (await pool.query(`
+        insert into contextualised_by (lexeme, context)
+        VALUES (${lexeme_id}, ${contextID})
+    `)).rows))
+
+    ctx.body = {contexts: done}
+}
+
 export default new Router()
     .post('/', create)
     .get('/', list)
@@ -228,6 +247,7 @@ export default new Router()
     // CONTEXTS //
     .post('/:lexeme_id/context', assignContext)
     .delete('/:lexeme_id/context/:context_id', disconnectContext)
+    .put('/:lexeme_id/context/', updateContexts)
 
 
     //EXAMPLE//

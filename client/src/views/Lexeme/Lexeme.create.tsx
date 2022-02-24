@@ -4,6 +4,7 @@ import {useGetAsync} from "../../common/useAsyncState";
 import {ContextCheckbox} from "../../components/ContextCheckbox";
 import {ModifiableTextField} from "../../components/ModifiableTextField";
 import {Link} from "react-router-dom";
+import {api} from "../../common/api";
 
 
 function SelectPOS(props: { onChange: (value) => void }) {
@@ -57,15 +58,15 @@ export const Creator = () => {
 
   const {value: contexts} = useGetAsync(async () => (await axios.get(`http://localhost:8080/api/context`)).data)
 
-  const saveSpelling = async (value) => {
-    const reqSpellings = await axios.post(
-      `http://localhost:8080/api/spelling`,
-      {
-        text: value
-      }
-    );
-    return reqSpellings.data.word_id
-  };
+  // const saveSpelling = async (value) => {
+  //   const reqSpellings = await axios.post(
+  //     `http://localhost:8080/api/spelling`,
+  //     {
+  //       text: value
+  //     }
+  //   );
+  //   return reqSpellings.data.word_id
+  // };
 
   const saveInflected = async (lexeme, category, spelling) => {
     await axios.post(`http://localhost:8080/api/lexeme/${lexeme}/inflected/`,
@@ -91,18 +92,18 @@ export const Creator = () => {
     // categories and inflected forms
     const inflectedForms = Object.keys(categoriesInput).map(key => ({key, value: categoriesInput[key]}));
 
-    // save spellings to db
+    // // save spellings to db
     const data = await Promise.all(inflectedForms.map(async el => ({
-      ...el, spelling: await saveSpelling(el.value)
+      ...el, spelling: el.value
     })))
 
-    console.log(data)
+    // console.log(data)
 
     // fixme: verify lemma is not null
-    const lemmaID = await saveSpelling(lemma)
+    // const lemmaID = await saveSpelling(lemma)
 
-    const re = await axios.post('http://localhost:8080/api/lexeme', {
-      spelling: lemmaID,
+    const re = await api.post('http://localhost:8080/api/lexeme', {
+      spelling: lemma,
       pos: selectedPOS,
       definition
     })
@@ -120,14 +121,22 @@ export const Creator = () => {
 
   return (
     <div className={''}>
-      <h1 className={'title'}>🧙 Entry / Create</h1>
+      {reqSpelling && (<>
+          <div className={'notification is-success'}>
+            New lexeme created! You can see it <Link to={`/lexeme/${JSON.parse(reqSpelling).lexeme_id}`}>here</Link>
+            {/*{reqSpelling}*/}
+          </div>
+        </>
+      )}
+
+      <h1 className={'title'}>🧙 Entry Creator</h1>
 
       <SelectPOS onChange={value => setSelectedPOS(value)}/>
 
       <ModifiableTextField initialValue={''} onValueChange={value => setLemma(value)}/>
 
       <div className={'field block'}>
-        <label className={'label'} htmlFor="def">Definition (varchar 50)</label>
+        <label className={'label'} htmlFor="def">Definition</label>
         <input className={'input'} type="text" value={definition} onChange={e => setDefinition(e.target.value)}/>
       </div>
 
@@ -165,15 +174,6 @@ export const Creator = () => {
       <div className={'block'}>
         <button className={'button is-primary'} onClick={handleSubmit}>Submit</button>
       </div>
-
-
-      {reqSpelling && (<>
-          <div className={'notification is-success'}>
-            New lexeme created! You can see it <Link to={`/lexeme/${JSON.parse(reqSpelling).lexeme_id}`}>here</Link>
-            {/*{reqSpelling}*/}
-          </div>
-        </>
-      )}
     </div>
   );
 };

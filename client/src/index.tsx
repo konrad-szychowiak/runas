@@ -18,6 +18,7 @@ import {SemanticGroupCreate} from "./views/Group/SemanticGroup.create";
 import {SemanticGroupUpdate} from "./views/Group/SemanticGroup.update";
 import {MorphoGroupCreate} from "./views/Group/MorphoGroup.create";
 import {MorphoGroupUpdate} from "./views/Group/MorphoGroup.update";
+import {GroupRead} from "./views/Group/Group.read";
 
 ReactDOM.render(
   <HashRouter>
@@ -25,6 +26,9 @@ ReactDOM.render(
       <Route path={'/'} element={<App/>}>
         <Route path={''} element={<DictionaryView/>}/>
         <Route path={'wizard'} element={<Lexeme.Creator/>}/>
+        <Route path={'group'}>
+          <Route path={':group_id'} element={<GroupRead />} />
+        </Route>
         <Route path={'design'} element={<Design/>}>
           <Route path={''} element={<DesignInfo/>}/>
           <Route path={'pos'}>

@@ -71,6 +71,7 @@ const createCategory = async ctx => {
     const result = (await pool.query(`insert into paradigm_category ("name", part_of_speech)
                                       values ($1, $2)
                                       returning *`, [n, pos_id])).rows[0]
+    await pool.query(`call reflect_paradigm_update_on_existing(${pos_id});`)
     if (result) ctx.body = result
 }
 

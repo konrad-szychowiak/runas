@@ -61,7 +61,7 @@ export function SemanticGroupUpdate() {
     }
     try {
       const res = (await api.put(`/group/${group_id}/semantic/`, {meaning, description})).data;
-      alert(JSON.stringify(res))
+      alert(`Assigned successfully!`)
     } catch (e) {
       error$alert(e)
     } finally {
@@ -74,7 +74,7 @@ export function SemanticGroupUpdate() {
 
     try {
       const res = (await api.put(`/group/${group_id}/lexeme`, {lexemes: selectedLexeme})).data;
-      alert(JSON.stringify(res))
+      alert(`Assigned successfully!`)
       getLexeme();
     } catch (e) {
       error$alert(e)
@@ -110,8 +110,8 @@ export function SemanticGroupUpdate() {
           setSelectedLexeme(selected)
           console.log(selectedLexeme)
         }}/>
-        <br/>
 
+        <br/>
 
         {/*<Link to={'/design/pos/'}>*/}
         <button className={"button is-primary"} onClick={() => onAssign()}>Assign</button>

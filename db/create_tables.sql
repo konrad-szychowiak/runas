@@ -12,27 +12,24 @@ drop table if exists paradigm_category;
 drop table if exists part_of_speech;
 drop table if exists spelling;
 
-DROP DOMAIN IF EXISTS description;
-CREATE DOMAIN description as varchar(100);
-
 create table spelling
 (
     word_id  serial primary key,
-    spelling varchar(50) not null
+    spelling text not null
 );
 
 create table part_of_speech
 (
     pos_id      serial primary key,
-    name        varchar(50) not null,
-    description description null
+    name        text not null,
+    description text null
 );
 
 create table paradigm_category
 (
     category_id    serial primary key,
     part_of_speech int references part_of_speech (pos_id) on delete cascade,
-    name           varchar(50) not null
+    name           text not null
 );
 
 create table lexeme
@@ -40,14 +37,14 @@ create table lexeme
     lexeme_id      serial primary key,
     part_of_speech int references part_of_speech (pos_id) on delete cascade,
     spelling       int references spelling (word_id) on delete cascade,
-    definition     varchar(50) not null
+    definition     text not null
 );
 
 create table context
 (
     context_id  serial primary key,
-    name        varchar(50) not null,
-    description varchar(50) null
+    name        text not null,
+    description text null
 );
 
 create table contextualised_by
@@ -60,9 +57,8 @@ create table contextualised_by
 create table use_example
 (
     example_id serial primary key,
-    text       varchar(50) not null,
-    -- TODO: rename `source_ref` -> `source`
-    source_ref varchar(50) null
+    text       text not null,
+    source_ref text null
 );
 
 create table exemplified_by
@@ -83,20 +79,19 @@ CREATE TABLE inflected_form
 create table "group"
 (
     group_id    serial primary key,
-    description varchar(50) not null
+    description text not null
 );
 
 create table morphological_group
 (
     group_id int primary key references "group" (group_id) on delete cascade not null,
---     fixme: what to do, when lexeme is deleted?
     core     int references lexeme (lexeme_id) on delete cascade             not null
 );
 
 create table semantic_group
 (
     group_id int primary key references "group" (group_id) on delete cascade,
-    meaning  varchar(100) not null
+    meaning  text not null
 );
 
 create table belonging
@@ -105,23 +100,3 @@ create table belonging
     "group" int references "group" (group_id) on delete cascade,
     primary key (lexeme, "group")
 );
-
--- views
-
-drop view if exists full_morphological_group_view;
-create view full_morphological_group_view as
-select group_id        as id,
-       description,
-       core,
-       'morphological' as group_type
-from "group" g
-         join morphological_group mg using (group_id);
-
-drop view if exists full_semantic_group_view;
-create view full_semantic_group_view as
-select group_id   as id,
-       description,
-       meaning,
-       'semantic' as group_type
-from "group" g
-         join semantic_group mg using (group_id);

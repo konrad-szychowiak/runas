@@ -1,7 +1,11 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
-export function ContextCheckbox(props: { lexeme?: number, context: any, onAdd: Function, onRemove: Function }) {
-  const [checked, setChecked] = useState(false)
+export function ContextCheckbox(props: { lexeme?: number, context: any, onAdd: Function, onRemove: Function, initiallySelected?: boolean }) {
+  const [checked, setChecked] = useState(props.initiallySelected ?? false)
+
+  useEffect(() => {
+    setChecked(props.initiallySelected)
+  }, [props.initiallySelected])
 
   const toggleContext = () => {
     console.log(props.context)

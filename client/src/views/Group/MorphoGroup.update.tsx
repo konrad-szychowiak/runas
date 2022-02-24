@@ -79,7 +79,7 @@ export function MorphoGroupUpdate() {
 
     try {
       const res = (await api.put(`/group/${group_id}/lexeme`, {lexemes: selectedLexeme})).data;
-      alert(JSON.stringify(res))
+      alert(`Assigned successfully!`)
       getLexeme();
     } catch (e) {
       error$alert(e)
