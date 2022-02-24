@@ -3,13 +3,13 @@ import {createContext, deleteContext, listContext, readContext, updateContext} f
 
 export const contextController =
     new Router()
-        // Create
+        // POSCreate
         .post('/', async ctx => {
             const {name, description} = ctx.request.body
             // todo: constraints
             ctx.body = await createContext(name, description)
         })
-        // Read
+        // LexemeRead
         .get('/:id', async ctx => {
             const {id} = ctx.params
             console.log(id)

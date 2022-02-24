@@ -1,6 +1,6 @@
 import * as spellingService from "../services/spelling.service.js";
 import Router from "@koa/router";
-import {sql} from "../db.js";
+import {pool, sql} from "../db.js";
 
 export const spellingController = {
 
@@ -38,17 +38,19 @@ export default new Router()
     .delete('/', spellingController.delete)
     .post('/', async (ctx) => {
         const {text} = ctx.request.body
-        const [foo] = await sql`select *
-                              from spelling
-                              where spelling.spelling = ${text}`
-        if(foo) {
-            ctx.body = { ...foo, message: 'existed' };
-            return
-        }
-        await sql`insert into spelling (spelling)
-                  values (${text});`
-        const [bar] = await sql`select *
-                              from spelling
-                              where spelling.spelling = ${text}`
-        ctx.body = { ...bar, message: 'created' };
+        // const [foo] = (await pool.query(`select *
+        //                       from spelling
+        //                       where spelling.spelling = ${text}`)).rows
+        // if(foo) {
+        //     ctx.body = { ...foo, message: 'existed' };
+        //     return
+        // }
+        // await sql`insert into spelling (spelling)
+        //           values (${text});`
+        // const [bar] = await sql`select *
+        //                       from spelling
+        //                       where spelling.spelling = ${text}`
+        const [id] = (await pool.query(`select branch_off_spelling($1)
+                                        from spelling;`, [text])).rows
+        ctx.body = {id};
     })

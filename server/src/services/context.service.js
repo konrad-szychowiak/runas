@@ -1,4 +1,4 @@
-import {sql} from "../db.js";
+import {pool, sql} from "../db.js";
 
 export const createContext = async (name, description) => {
     if (description)
@@ -53,6 +53,6 @@ export const deleteContext = async (id) => {
 }
 
 export const listContext = async () => {
-    return await sql`select *
-                     from context;`;
+    return (await pool.query(`select *
+                              from context;`)).rows
 }

@@ -1,53 +1,50 @@
 drop table if exists belonging;
-drop table if exists syntactic_group;
-drop table if exists morphological_group;
+drop table if exists semantic_group cascade ;
+drop table if exists morphological_group cascade ;
 drop table if exists "group";
 drop table if exists inflected_form;
 drop table if exists exemplified_by;
 drop table if exists use_example;
 drop table if exists contextualised_by;
 drop table if exists context;
-drop table if exists lexeme;
+drop table if exists lexeme cascade;
 drop table if exists paradigm_category;
 drop table if exists part_of_speech;
 drop table if exists spelling;
 
-DROP DOMAIN IF EXISTS description;
-CREATE DOMAIN description as varchar(100);
-
 create table spelling
 (
     word_id  serial primary key,
-    spelling varchar(50) not null
+    spelling text not null
 );
 
 create table part_of_speech
 (
     pos_id      serial primary key,
-    name        varchar(50) not null,
-    description description null
+    name        text not null,
+    description text null
 );
 
 create table paradigm_category
 (
     category_id    serial primary key,
-    part_of_speech int references part_of_speech (pos_id),
-    name           varchar(50) not null
+    part_of_speech int references part_of_speech (pos_id) on delete cascade,
+    name           text not null
 );
 
 create table lexeme
 (
     lexeme_id      serial primary key,
-    part_of_speech int references part_of_speech (pos_id),
-    spelling       int references spelling (word_id),
-    definition     varchar(50) not null
+    part_of_speech int references part_of_speech (pos_id) on delete cascade,
+    spelling       int references spelling (word_id) on delete cascade,
+    definition     text not null
 );
 
 create table context
 (
     context_id  serial primary key,
-    name        varchar(50) not null,
-    description varchar(50) null
+    name        text not null,
+    description text null
 );
 
 create table contextualised_by
@@ -60,47 +57,46 @@ create table contextualised_by
 create table use_example
 (
     example_id serial primary key,
-    text       varchar(50) not null,
-    -- TODO: rename `source_ref` -> `source`
-    source_ref varchar(50) null
+    text       text not null,
+    source_ref text null
 );
 
 create table exemplified_by
 (
-    lexeme  int references lexeme (lexeme_id),
-    example int references use_example (example_id) ON DELETE CASCADE ,
+    lexeme  int references lexeme (lexeme_id) on delete cascade,
+    example int references use_example (example_id) ON DELETE CASCADE,
     primary key (lexeme, example)
 );
 
 CREATE TABLE inflected_form
 (
     lexeme   int REFERENCES lexeme (lexeme_id) ON DELETE CASCADE,
-    category int REFERENCES paradigm_category (category_id),
-    spelling int REFERENCES spelling (word_id),
+    category int REFERENCES paradigm_category (category_id) on delete cascade,
+    spelling int REFERENCES spelling (word_id) on delete cascade,
     PRIMARY KEY (lexeme, category, spelling)
 );
 
 create table "group"
 (
     group_id    serial primary key,
-    description varchar(50) not null
+    description text not null
 );
 
 create table morphological_group
 (
-    group_id int primary key references "group" (group_id),
-    core     int references lexeme (lexeme_id)
+    group_id int primary key references "group" (group_id) on delete cascade not null,
+    core     int references lexeme (lexeme_id) on delete cascade             not null
 );
 
-create table syntactic_group
+create table semantic_group
 (
-    group_id int primary key references "group" (group_id),
-    meaning  varchar(100) not null
+    group_id int primary key references "group" (group_id) on delete cascade,
+    meaning  text not null
 );
 
 create table belonging
 (
     lexeme  int references lexeme (lexeme_id) ON DELETE CASCADE,
-    "group" int references "group" (group_id),
+    "group" int references "group" (group_id) on delete cascade,
     primary key (lexeme, "group")
 );
