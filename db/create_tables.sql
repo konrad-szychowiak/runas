@@ -125,3 +125,28 @@ select group_id   as id,
        'semantic' as group_type
 from "group" g
          join semantic_group mg using (group_id);
+
+--procedures
+use master
+go
+
+create procedure dbo.FindStringInTable @stringToFind VARCHAR (max), @schema sysname, @table sysname
+AS 
+
+set NOCOUNT on 
+
+begin TRY
+    declare @sqlCommand varchar(max) = 'select * from [' + @schema + '].[' + @table + '] WHERE'
+    
+    select @sqlCommand = sqlCommand + '[' + COLUMN_NAME + '] LIKE ''' + @stringToFind + ''' or '
+    from INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = @schema and TABLE_NAME = @table and DATA_TYPE in ('char', 'nchar', 'ntext', 'nvarchar', 'text', 'varchar')
+
+    set @sqlCommand = left(@sqlCommand, len(@sqlCommand) - 3)
+    exec(@sqlCommand)
+    print @sqlCommand
+END TRY
+
+begin CATCH
+    print 'There was and error. Check to make sure object exists.'
+    print error_message()
+end catch
