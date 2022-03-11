@@ -113,6 +113,7 @@ export default new Router()
     // POSCreate
     .post('/:pos_id/category/', createCategory)
     // Read
+    // ---
     // Update
     .put('/:pos_id/category/:category_id', updateCategory)
     // Delete

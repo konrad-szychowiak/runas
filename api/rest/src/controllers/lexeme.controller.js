@@ -1,6 +1,5 @@
-import {pool, sql} from "../../db.js";
+import {pool, sql} from "../db.js";
 import Router from "@koa/router";
-import _ from "lodash";
 
 const list = async (ctx) => {
     // TODO

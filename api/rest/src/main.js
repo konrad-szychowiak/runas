@@ -5,16 +5,20 @@ import spelling from "./controllers/spelling.controller.js";
 import context from "./controllers/context.controller.js";
 import pos from "./controllers/pos.controller.js";
 import example from "./controllers/examples.controller.js";
-import lexeme from "./controllers/lexeme/lexeme.controller.js";
+import lexeme from "./controllers/lexeme.controller.js";
 import group from './controllers/group.controller.js'
 import cors from '@koa/cors'
 import logger from 'koa-logger'
 
 const PORT = 8080
 
-async function main() {
+function main() {
     const app = new Koa();
-    const router = new Router({prefix: '/api'});
+    /**
+     * Main koa router for the API.
+     * @type {module:koa-router|Router}
+     */
+    const router = new Router({prefix: '/graphql'});
 
     app.use(logger())
     app.use(bodyParser())
@@ -29,8 +33,6 @@ async function main() {
 
     app.use(router.routes());
     app.use(router.allowedMethods());
-
-    // pool.connect()
 
     app.listen(PORT, () => {
         console.log('App listening on ' + PORT)

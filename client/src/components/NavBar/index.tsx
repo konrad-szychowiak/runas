@@ -10,10 +10,10 @@ function NavBar() {
       <section className="hero is-primary mb-5">
         <div className="hero-body">
           <p className="title">
-            SQL Dictionary
+            Trønderskordbok
           </p>
           <p className="subtitle">
-            An SQL & NoSQL Database Management Showcase
+            Ordboka av trønderske dialektord
           </p>
         </div>
 

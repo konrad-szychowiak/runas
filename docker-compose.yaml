@@ -11,10 +11,10 @@ services:
     env_file:
       - .env
 
-  server:
-    container_name: "runas-server"
+  rest-server:
+    container_name: "runas-rest"
     build:
-      context: ./server
+      context: api/rest
       dockerfile: Dockerfile
     ports:
       - "8080:8080"

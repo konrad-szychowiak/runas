@@ -4,6 +4,7 @@ import {useGetAsync} from "../../common/useAsyncState";
 import axios from "axios";
 import {LexemeUsages} from "../../components/LexemeUsages";
 import {api, error$alert} from "../../common/api";
+import ReactMarkdown from "react-markdown";
 
 export function LexemeRead() {
   const {lexeme_id: id} = useParams()
@@ -61,7 +62,9 @@ export function LexemeRead() {
                 </>
               ))}
             </div>
-            <p className={'notification is-info is-light'}>{definition}</p>
+            <p className={'notification is-info is-light'}>
+              <ReactMarkdown children={definition}/>
+            </p>
           </div>
 
           <h2 className="subtitle">Inflected Forms</h2>

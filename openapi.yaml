@@ -3,7 +3,7 @@ info:
   title: Runas OpenAPI Specification
   version: 0.0.1
 servers:
-  - description: Test server, local
+  - description: Test rest, local
     url: localhost:8080
 tags:
   - name: dictionary
